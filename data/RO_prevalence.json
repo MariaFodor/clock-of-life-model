@@ -1,0 +1,20 @@
+{
+ "current_smoking_pct": [
+  28.1,
+  "2019"
+ ],
+ "daily_smoking_pct": [
+  19.7,
+  "2019"
+ ],
+ "obese_pct": [
+  10.9,
+  "2019"
+ ],
+ "overweight_plus_pct": [
+  58.7,
+  "2019"
+ ],
+ "_source": "Eurostat EHIS wave 3 (2019), geo=RO, adults 18+, both sexes",
+ "_retrieved": "2026-09-03"
+}
