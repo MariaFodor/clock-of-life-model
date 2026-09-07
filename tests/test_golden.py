@@ -18,7 +18,9 @@ def main():
     checks = []
     checks.append(("n == 18839", fit["n"] == 18839))
     checks.append(("deaths == 2119", fit["deaths"] == 2119))
-    checks.append(("C-index in [0.785, 0.80]", 0.785 <= g["c_index"] <= 0.80))
+    # Bumped from [0.785, 0.80] after adding the cohort BMI + current-smoking-dose + systolic-BP features
+    # (clock_dev EXP-14: +0.027 out-of-sample C-index). Alcohol stays a literature monotonic lever.
+    checks.append(("C-index in [0.812, 0.828]", 0.812 <= g["c_index"] <= 0.828))
     checks.append(("calibration MAE <= 0.02", g["calibration_mae"] <= 0.02))
 
     # centring: average Romanian ≈ national life expectancy at 40
