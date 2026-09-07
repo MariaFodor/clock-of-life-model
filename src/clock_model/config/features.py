@@ -15,9 +15,12 @@ YOUNG_CUTOFF = 55
 COHORT_FEATURES = [
     ("smk_former",   "lever",   "strong",   "Cox 1972; smoking cohorts"),
     ("smk_current",  "lever",   "strong",   "smoking cohorts"),
+    ("cigs_day",     "lever",   "strong",   "smoking dose-response cohorts"),
     ("activity",     "lever",   "strong",   "WHO PA guidelines; dose-response meta-analyses"),
     ("sleep_long",   "lever",   "moderate", "Cappuccio 2010 sleep U-shape"),
     ("waist",        "lever",   "strong",   "central-adiposity mortality cohorts"),
+    ("bmi",          "lever",   "moderate", "BMI/adiposity mortality cohorts (adds to waist: low-BMI+high-waist = frailty)"),
+    ("sbp",          "manage",  "strong",   "systolic blood-pressure mortality cohorts (adds to hbp_told)"),
     ("diabetes",     "manage",  "strong",   "diabetes mortality"),
     ("high_bp",      "manage",  "strong",   "hypertension mortality"),
     ("respiratory",  "manage",  "strong",   "COPD mortality"),
@@ -31,7 +34,7 @@ COHORT_FEATURES = [
 INTERACTIONS = ["smk_current", "activity", "waist"]
 
 # Continuous features that are standardized; μ/σ are learned from training and shipped in the bundle.
-STANDARDIZED = ["activity", "waist", "income"]
+STANDARDIZED = ["activity", "waist", "income", "cigs_day", "bmi", "sbp"]
 
 
 def _raw_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -39,9 +42,12 @@ def _raw_columns(df: pd.DataFrame) -> pd.DataFrame:
     out = pd.DataFrame(index=df.index)
     out["smk_former"]  = (df["smoke"] == 1).astype(float)
     out["smk_current"] = (df["smoke"] == 2).astype(float)
+    out["cigs_day"]    = df["cigs_day"].astype(float)                      # current-smoker dose (0 for non-current)
     out["activity"]    = np.log(df["pa_min"].astype(float) + 1.0)          # log MET-minutes
     out["sleep_long"]  = (df["sleep"].astype(float) >= 8.5).astype(float)  # long-sleep flag (short dropped, EXP-12)
     out["waist"]       = df["waist"].astype(float)
+    out["bmi"]         = df["bmi"].astype(float)
+    out["sbp"]         = df["sbp"].astype(float)                          # systolic BP (mmHg)
     out["diabetes"]    = df["diab"].astype(float)
     out["high_bp"]     = df["hbp_told"].astype(float)
     out["respiratory"] = ((df["copd"] == 1) | (df["bronchitis"] == 1)).astype(float)

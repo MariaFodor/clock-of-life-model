@@ -10,9 +10,13 @@ import pandas as pd
 from lifelines import CoxPHFitter
 
 from clock_model.config import features as F
+from clock_model.ingest import impute
 
 NEEDS = ["smoke", "pa_min", "sleep", "waist", "diab", "hbp_told", "copd", "bronchitis",
          "pfq_diff", "mi", "stroke", "chf", "cancer", "educ_hi", "income", "age", "sex", "pm", "dead"]
+# Self-reportable extras filled by training-only imputation (EXP-14); not part of the complete-case filter.
+# (alcohol is handled by the literature monotonic lever, not fitted here — see config/literature.py.)
+IMPUTED = ["bmi", "cigs_day", "sbp"]
 
 # Levers-only design for the total-effect attribution model.
 LEVER_COLS = ["smk_former", "smk_current", "activity", "sleep_long", "waist",
@@ -22,8 +26,9 @@ PENALIZER = 1e-4   # tiny ridge, matches the robust-fit stabilisation used in th
 
 
 def complete_cohort(df: pd.DataFrame) -> pd.DataFrame:
-    d = df[[c for c in NEEDS]].copy()
-    d = d.dropna(subset=NEEDS)
+    df = impute.impute_cohort(df)                 # fill bmi/alc_day/cigs_day (training-only, EXP-14)
+    d = df[NEEDS + IMPUTED].copy()
+    d = d.dropna(subset=NEEDS)                     # essential predictors must be observed
     return d.reset_index(drop=True)
 
 
