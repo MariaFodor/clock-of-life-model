@@ -28,7 +28,7 @@ def _zero_cigs_for_nonsmokers(df: pd.DataFrame) -> pd.Series:
     return cig.where(df["smoke"] == 2, 0.0)
 
 
-def impute_cohort(df: pd.DataFrame, targets=("bmi", "cigs_day", "sbp")) -> pd.DataFrame:
+def impute_cohort(df: pd.DataFrame, targets=("cigs_day", "sbp")) -> pd.DataFrame:
     """Return a copy of df with `targets` filled by iterative ridge regression on PREDICTORS.
 
     Rows still missing a PREDICTOR are left to the caller's dropna (the essential columns); imputation
@@ -63,6 +63,9 @@ def impute_cohort(df: pd.DataFrame, targets=("bmi", "cigs_day", "sbp")) -> pd.Da
             filled[t] = np.where(miss[t], pred, filled[t])
 
     # Clip imputed draws to physically sensible ranges (regression can overshoot slightly).
+    # Plausible ranges for the imputed columns. (bmi/alc_day were targets in earlier versions:
+    # bmi dropped in REFIT-01, alcohol is a literature lever — kept here only as bounds if either
+    # is ever re-imputed.)
     bounds = {"bmi": (12.0, 70.0), "alc_day": (0.0, 30.0), "cigs_day": (0.0, 80.0), "sbp": (70.0, 240.0)}
     for t in targets:
         col = filled[t]

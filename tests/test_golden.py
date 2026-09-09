@@ -18,9 +18,11 @@ def main():
     checks = []
     checks.append(("n == 18839", fit["n"] == 18839))
     checks.append(("deaths == 2119", fit["deaths"] == 2119))
-    # Bumped from [0.785, 0.80] after adding the cohort BMI + current-smoking-dose + systolic-BP features
-    # (clock_dev EXP-14: +0.027 out-of-sample C-index). Alcohol stays a literature monotonic lever.
-    checks.append(("C-index in [0.812, 0.828]", 0.812 <= g["c_index"] <= 0.828))
+    # REFIT-01 dropped BMI (owner decision 2026-09-09): 0.820 -> 0.805. The 0.015 of discrimination
+    # lost was bought by a NEGATIVE bmi coefficient fighting waist (r ~ 0.9) — i.e. the model was
+    # ranking better partly by claiming a uniformly heavier person lives longer. Honest trade.
+    checks.append(("C-index in [0.798, 0.812]", 0.798 <= g["c_index"] <= 0.812))
+    checks.append(("bmi is not a fitted feature (REFIT-01)", "bmi" not in fit["prediction_coefs"]))
     checks.append(("calibration MAE <= 0.02", g["calibration_mae"] <= 0.02))
 
     # centring: average Romanian ≈ national life expectancy at 40
