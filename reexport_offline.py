@@ -11,7 +11,7 @@ import argparse, json, os, sys
 import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
-from clock_model.model import cox, centring
+from clock_model.model import cox, centring, fit as FIT
 from clock_model.evaluate import gates as G
 from clock_model.export import bundle
 
@@ -27,7 +27,7 @@ def main() -> None:
     args = ap.parse_args()
 
     df = pd.DataFrame(json.load(open(os.path.join(DATA, "wide.json"))))
-    fit = cox.fit_models(df)
+    fit = FIT.fit_models(df)
     gates = G.evaluate(fit)
     print(f"[reexport] n={fit['n']} deaths={fit['deaths']} "
           f"C-index={gates['c_index']} calibration={gates['calibration_mae']} passed={gates['passed']}")

@@ -8,6 +8,7 @@ from clock_model.config import features as F
 from clock_model.config.literature import LITERATURE
 from clock_model.config.cycles import MORT_FOLLOWUP_THROUGH
 from clock_model.config.countries import LIFETABLE_YEAR
+from clock_model.ontology import _PATH as ONT_PATH
 
 
 def _write(path: str, obj) -> None:
@@ -38,7 +39,16 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
 
     coefficients = {
         "prediction": fit["prediction_coefs"],
-        "attribution": fit["attribution_coefs"],
+        # Total effects: one per lever, each fitted on the adjustment set the causal graph implies
+        # (confounders only, never mediators), then precision-weighted against the literature prior.
+        # These are what What-If and the recommendations may use; they are NOT summable with the
+        # prediction coefficients, because that would double-count every mediated path.
+        "total_effect": fit["total_effect_coefs"],
+        "total_effect_sd": fit.get("total_effect_sd", {}),
+        "total_effect_source": fit.get("total_effect_source", {}),
+        "adjustment_sets": fit.get("adjustment_sets", {}),
+        "strata": fit.get("strata", {}),
+        "attribution": fit.get("attribution_coefs", fit["total_effect_coefs"]),
         # Fitted standardizers + the literature features' published/declared ones, in one map, so
         # the service z-scores every continuous input the same way (and can validate coverage).
         # A key can only come from one side: if a future fit gains a column the literature also
@@ -49,7 +59,24 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
     }
     _write(os.path.join(root, "coefficients.json"), coefficients)
 
-    evidence = F.evidence_table()
+    # The ontology travels with the model: the service reads roles, signs, grades and the article
+    # links straight from it, so there is one source of truth end to end instead of four copies.
+    ont_raw = json.load(open(os.path.join(os.path.dirname(os.path.abspath(ONT_PATH)), "ontology.json")))
+    _write(os.path.join(root, "ontology.json"), ont_raw)
+
+    evidence = {}
+    for key, spec in ((k, v) for k, v in ont_raw.items() if not k.startswith("_")):
+        prior = spec.get("prior") or {}
+        evidence[key] = {
+            "role": spec.get("role", "context"),
+            "grade": spec.get("grade", "na"),
+            "citation": prior.get("title") or spec.get("study", ""),
+            "doi": prior.get("doi"),
+            "url": prior.get("url") or (f"https://doi.org/{prior['doi']}" if prior.get("doi") else None),
+            "first_author": prior.get("first_author"),
+            "year": prior.get("year"),
+            "study_slug": spec.get("study"),
+        }
     for k, v in LITERATURE.items():
         # ENV is CONTEXT for the personal clock (you don't "recommend" moving) and a lever only
         # inside "Where Should I Live?" (THE_QUESTIONNAIRE.md S10); the rest are true levers.
