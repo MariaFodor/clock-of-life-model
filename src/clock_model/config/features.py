@@ -2,9 +2,18 @@
 
 **BMI is deliberately absent** (owner decision 2026-09-09, REFIT-01). It was briefly added in v2.1.0
 and produced exactly the artifact EXP-03/04/06 had rejected it for: BMI and waist are ~0.9
-correlated, so the pair fought and BMI won with a NEGATIVE coefficient — the shipped model scored a
-uniformly heavier person as lower risk (an obese 60-year-old gained ~4.7 years). Waist is the
-adiposity measure; do not reintroduce BMI without a specification that prevents the collinearity.
+correlated, so the pair fought and BMI won with a large NEGATIVE coefficient (-1.006 against waist's
++0.779). Waist is the adiposity measure; do not reintroduce BMI without a specification that
+prevents the collinearity.
+
+**What removing BMI does NOT fix:** the *adjusted* waist coefficient in the prediction model is
+itself slightly negative (-0.098 here; -0.136 in v2.0.0, i.e. this is the pre-BMI baseline, not a
+new regression). That is the documented EXP-12 artifact — the prediction model conditions on
+diabetes, blood pressure and mobility, which are the very paths adiposity acts through, so the
+*direct* effect that survives adjustment is near zero and noisily negative. It is why attribution
+and What-If read the separate **total-effect** model, where waist is correctly +0.060. The
+consequence, stated plainly: for two users who answer identically except waist, the Life Clock
+number still moves the wrong way. Tracked as M10 — needs an owner decision, not a silent fix.
 
 
 Mirrors clock_dev/FEATURES_AND_QUESTIONS.md (the design deliverable) and the witnessed encodings from

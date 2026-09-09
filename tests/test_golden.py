@@ -18,11 +18,19 @@ def main():
     checks = []
     checks.append(("n == 18839", fit["n"] == 18839))
     checks.append(("deaths == 2119", fit["deaths"] == 2119))
-    # REFIT-01 dropped BMI (owner decision 2026-09-09): 0.820 -> 0.805. The 0.015 of discrimination
-    # lost was bought by a NEGATIVE bmi coefficient fighting waist (r ~ 0.9) — i.e. the model was
-    # ranking better partly by claiming a uniformly heavier person lives longer. Honest trade.
+    # REFIT-01 dropped BMI (owner decision 2026-09-09): 0.820 -> 0.805. The lost 0.015 was bought
+    # by a large negative bmi coefficient fighting waist (r ~ 0.9). Band is tight because the fit is
+    # deterministic (three runs agree to 10 dp); it brackets the witnessed value, and its upper
+    # bound is what would catch a BMI reintroduction.
     checks.append(("C-index in [0.798, 0.812]", 0.798 <= g["c_index"] <= 0.812))
     checks.append(("bmi is not a fitted feature (REFIT-01)", "bmi" not in fit["prediction_coefs"]))
+    # The number What-If and Why? deliver must say a bigger waist is worse. (The *prediction*
+    # model's adjusted waist coefficient is negative — the EXP-12 mediator-adjustment artifact,
+    # tracked as M10; this check pins the half the product actually presents as a lever.)
+    checks.append(("attribution: waist is correctly signed (bigger waist = worse)",
+                   fit["attribution_coefs"]["waist"] > 0))
+    checks.append(("attribution: smoking is correctly signed",
+                   fit["attribution_coefs"]["smk_current"] > 0))
     checks.append(("calibration MAE <= 0.02", g["calibration_mae"] <= 0.02))
 
     # centring: average Romanian ≈ national life expectancy at 40

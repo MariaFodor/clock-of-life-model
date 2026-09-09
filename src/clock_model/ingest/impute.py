@@ -1,8 +1,9 @@
 """Training-only imputation of self-reported features that NHANES leaves partly blank.
 
-The shipped model gains two self-reportable cohort predictors — BMI and current-smoking dose
-(cigarettes/day) — validated out-of-sample in clock_dev EXP-14/14b. In the cohort these carry blanks
-(BMI ~5%; cigarettes only asked of *current* smokers), so to train on them without dropping rows we fill
+The shipped model gains two self-reportable cohort predictors — current-smoking dose (cigarettes/day)
+and systolic blood pressure — validated out-of-sample in clock_dev EXP-14/14b. (BMI was a third until
+REFIT-01 dropped it; see config/features.py for why.) In the cohort these carry blanks (cigarettes are
+only asked of *current* smokers), so to train on them without dropping rows we fill
 the blanks by iterative ridge regression on the always-present predictors (MICE-lite). This is a
 TRAINING-ONLY step: at prediction time the questionnaire supplies every value, so the Rust runtime never
 imputes and the bundle ships only coefficients + standardizer. (Alcohol is handled separately, by the
