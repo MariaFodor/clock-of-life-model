@@ -45,7 +45,10 @@ def main():
     # Every gate the ontology implies, re-checked on this artifact.
     for name, ok, detail in OG.check(fit):
         checks.append((f"ontology gate — {name}", ok))
-    checks.append(("calibration MAE <= 0.02", g["calibration_mae"] <= 0.02))
+    # Measured WITHIN strata since ONT-02: each age x sex stratum has its own baseline, so a pooled
+    # Breslow curve would score the model against one it never uses (that read 0.026; the honest
+    # within-stratum figure is 0.013).
+    checks.append(("calibration MAE <= 0.02 (within strata)", g["calibration_mae"] <= 0.02))
 
     # centring: average Romanian ≈ national life expectancy at 40
     prev = json.load(open(os.path.join(DATA, "RO_prevalence.json")))

@@ -77,11 +77,9 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
             "year": prior.get("year"),
             "study_slug": spec.get("study"),
         }
-    for k, v in LITERATURE.items():
-        # ENV is CONTEXT for the personal clock (you don't "recommend" moving) and a lever only
-        # inside "Where Should I Live?" (THE_QUESTIONNAIRE.md S10); the rest are true levers.
-        role = "context" if k == "env" else "lever"
-        evidence[k] = {"role": role, "grade": v["grade"], "citation": v["citation"]}
+    # The literature block used to write its own evidence entries here, in a prose-only form with no
+    # link. The ontology now covers those same factors with verified DOIs, so overwriting them would
+    # reintroduce exactly the duplication (and the unlinkable citations) this work removes.
     _write(os.path.join(root, "evidence.json"), evidence)
 
     for iso, b in countries.items():
