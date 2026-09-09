@@ -15,7 +15,9 @@ import pandas as pd
 from clock_model.config import countries as C
 from clock_model.config.countries import LIFETABLE_YEAR
 from clock_model.model import cox, centring, baselines
+from clock_model.model import fit as FIT
 from clock_model.evaluate import gates as G
+from clock_model.evaluate import ontology_gates as OG
 from clock_model.export import bundle
 from clock_model.fetch import eurostat
 
@@ -58,11 +60,19 @@ def build_country_baseline(iso: str, coefs: dict, rates: dict) -> dict | None:
 def train(country_list, version, from_raw=False):
     print(f"[train] cohort ({'raw NHANES' if from_raw else 'vendored harmonized'}) …")
     df = load_cohort(from_raw)
-    fit = cox.fit_models(df)
+    fit = FIT.fit_models(df)
     print(f"[train] fitted: n={fit['n']} deaths={fit['deaths']}")
 
     print("[train] evaluating gates …")
     gates = G.evaluate(fit)
+    # The ontology's own gates decide the release too, not just the numeric thresholds. Without this
+    # the promise "a violation refuses the release" was untrue: the checks existed but only the test
+    # suite ran them (PR#2 F2).
+    ont_failed = [f"{n}: {d}" for n, ok, d in OG.check(fit) if not ok]
+    if ont_failed:
+        for f in ont_failed:
+            print(f"[gate] REFUSED — {f}")
+        sys.exit(f"[gate] {len(ont_failed)} ontology gate(s) failed — bundle not written.")
     print(f"        C-index={gates['c_index']}  calibration_mae={gates['calibration_mae']}  "
           f"passed={gates['passed']}")
     if not gates["passed"]:

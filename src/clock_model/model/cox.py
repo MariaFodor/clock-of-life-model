@@ -1,14 +1,14 @@
 """Fit the survival model with lifelines.
 
-Two models (per EXP-07/12): a PREDICTION model (all cohort predictors, with age-*interaction* terms —
-NOT age-stratified, and age itself is absent from the fit: see M11) for the Life-Clock
+Cohort assembly and the shared design helpers. The FITTING itself moved to `model/fit.py` in ONT-02
+(stratified by age band x sex, sign-constrained from the ontology); what remains here is the
+complete-case filter, the imputation entry point and the linear predictor
 number, and a TOTAL-EFFECT ATTRIBUTION model (modifiable levers only — no mediator conditioning) for
 "Why?"/What-If, so waist/sleep read honestly.
 """
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-from lifelines import CoxPHFitter
 
 from clock_model.config import features as F
 from clock_model.ingest import impute
@@ -20,10 +20,7 @@ NEEDS = ["smoke", "pa_min", "sleep", "waist", "diab", "hbp_told", "copd", "bronc
 IMPUTED = ["cigs_day", "sbp"]   # bmi dropped in REFIT-01 (collinear with waist — see features.py)
 
 # Levers-only design for the total-effect attribution model.
-LEVER_COLS = ["smk_former", "smk_current", "activity", "sleep_long", "waist",
-              "smk_current_x_young", "activity_x_young", "waist_x_young"]
 
-PENALIZER = 1e-4   # tiny ridge, matches the robust-fit stabilisation used in the experiments
 
 
 def complete_cohort(df: pd.DataFrame) -> pd.DataFrame:
@@ -33,37 +30,18 @@ def complete_cohort(df: pd.DataFrame) -> pd.DataFrame:
     return d.reset_index(drop=True)
 
 
-def _fit(design: pd.DataFrame, T, E) -> dict:
-    d = design.copy()
-    d["pm"] = np.asarray(T, dtype=float)
-    d["dead"] = np.asarray(E, dtype=int)
-    cph = CoxPHFitter(penalizer=PENALIZER)
-    cph.fit(d, duration_col="pm", event_col="dead", robust=False)
-    return cph
+def fit_models(df):
+    """Removed in ONT-02 — use `clock_model.model.fit.fit_models`.
 
-
-def fit_models(df: pd.DataFrame) -> dict:
-    """Returns the fitted artefacts needed for the bundle + evaluation."""
-    coh = complete_cohort(df)
-    standardizer = F.fit_standardizer(F._raw_columns(coh))
-    X = F.build_design(coh, standardizer)
-    T = coh["pm"].to_numpy(float)
-    E = coh["dead"].to_numpy(int)
-
-    prediction = _fit(X, T, E)
-    attribution = _fit(X[LEVER_COLS], T, E)
-
-    return {
-        "cohort": coh,
-        "standardizer": standardizer,
-        "design": X,
-        "T": T, "E": E,
-        "prediction_coefs": {k: float(v) for k, v in prediction.params_.items()},
-        "attribution_coefs": {k: float(v) for k, v in attribution.params_.items()},
-        "prediction_cph": prediction,
-        "n": len(coh), "deaths": int(E.sum()),
-    }
-
+    The old fit had no age/sex strata and no sign constraints, so it reported smoking as protective
+    for the under-55s and adiposity as protective for everyone. Kept only as this refusal because
+    `train.py` went on calling it silently for one commit after the rewrite — which is exactly what
+    a dead function that still returns something invites.
+    """
+    raise RuntimeError(
+        "cox.fit_models was replaced by clock_model.model.fit.fit_models (ONT-02): the old fit was "
+        "unstratified and unconstrained, and reported smoking as protective for the young."
+    )
 
 def linear_predictor(design: pd.DataFrame, coefs: dict) -> np.ndarray:
     cols = list(coefs.keys())

@@ -8,15 +8,15 @@ repo (developed inside `clock_dev/`, which is a dev context, not committed).
 `fetch → ingest → features → fit → baselines → evaluate → export`, driven by one command:
 
 ```bash
-python -m clock_model.train --countries all --version 2.0.0     # full run → artifacts/model-v2.0.0/
+python -m clock_model.train --countries all --version 3.0.0     # full run → artifacts/model-v3.0.0/
 python -m clock_model.train --countries RO,DE,FR                # a subset
 python -m clock_model.train --check-updates                     # report newer upstream data
 python -m clock_model.train --from-raw                          # rebuild the cohort from raw NHANES
 ```
 
-- **Engine:** lifelines Cox (interpretable). Two models: a **prediction** model and a separate
+- **Engine:** stratified Cox (scipy L-BFGS-B on the partial likelihood) (interpretable). Two models: a **prediction** model and a separate
   **total-effect attribution** model (levers only) for Why?/What-If. Age/sex go to the life-table
-  baseline; lever effects are **age-interacted (M11: the fit contains no age term — see REVIEW-2026-09-09.md)** (young/old).
+  baseline; lever effects are **age-interacted (age and sex are strata since v3.0.0, so coefficients compare like with like)** (young/old).
 - **Scrapers (real):** NHANES `.xpt` (CDC) + NCHS Linked Mortality `.dat` → harmonized cohort;
   Eurostat life tables + EHIS prevalence for **all 30 EU/EEA countries**. All cached under `data/cache/`.
 - **Multi-country baselines:** the Cox relative-risk model is country-agnostic; each country gets its own

@@ -18,16 +18,30 @@ def evaluate(fit: dict) -> dict:
 
     c = float(concordance_index(T, -lp, E))
 
-    # calibration at 10 years (120 months) by risk decile
-    H0 = baselines.breslow_H0(T, E, lp, at_time=120)
-    order = np.argsort(lp)
-    deciles = np.array_split(order, 10)
-    errs = []
-    for d in deciles:
-        pred = float(np.mean(np.exp(-H0 * np.exp(lp[d]))))
-        obs = _km_at(T[d], E[d], 120)
-        errs.append(abs(pred - obs))
-    cal_mae = float(np.mean(errs))
+    # Calibration at 10 years (120 months) by risk decile. Under an age x sex stratified fit each
+    # stratum has its OWN baseline hazard, so a single pooled Breslow baseline would score the model
+    # against a curve it never uses. Calibrate within strata and pool the errors by stratum size.
+    strata = fit.get("strata_labels")
+    if strata is None:
+        groups = [np.arange(len(T))]
+    else:
+        groups = [np.where(strata == s)[0] for s in np.unique(strata)]
+
+    errs, weights = [], []
+    for idx in groups:
+        if len(idx) < 100 or E.to_numpy()[idx].sum() < 20:
+            continue
+        Ts, Es, lps = T.to_numpy()[idx], E.to_numpy()[idx], lp[idx]
+        H0 = baselines.breslow_H0(Ts, Es, lps, at_time=120)
+        n_bins = min(5, max(2, len(idx) // 300))  # deciles are too thin inside a stratum
+        for d in np.array_split(np.argsort(lps), n_bins):
+            if len(d) < 30:
+                continue
+            pred = float(np.mean(np.exp(-H0 * np.exp(lps[d]))))
+            obs = _km_at(Ts[d], Es[d], 120)
+            errs.append(abs(pred - obs))
+            weights.append(len(d))
+    cal_mae = float(np.average(errs, weights=weights)) if errs else float("nan")
 
     gates = {
         "c_index": round(c, 3),
