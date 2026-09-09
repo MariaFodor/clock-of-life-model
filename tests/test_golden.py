@@ -61,12 +61,18 @@ def main():
 
     # Bundle-content checks (LEV-01): the exported v2.2.0 artifact must carry the literature
     # standardizers, centring references, the corrected env role, and a data-vintage stamp.
-    broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", "model-v3.0.0")
+    broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", "model-v3.0.1")
     if not os.path.isdir(broot):
-        sys.exit("GOLDEN: PRECONDITION MISSING — artifacts/model-v3.0.0 not found. Generate it first:\n"
-                 "  PYTHONPATH=src .venv/bin/python reexport_offline.py --from-version 2.2.0 --version 3.0.0")
+        sys.exit("GOLDEN: PRECONDITION MISSING — artifacts/model-v3.0.1 not found. Generate it first:\n"
+                 "  PYTHONPATH=src .venv/bin/python reexport_offline.py --from-version 3.0.0 --version 3.0.1")
     coefs = json.load(open(os.path.join(broot, "coefficients.json")))
     checks.append(("bundle ships the ontology", os.path.exists(os.path.join(broot, "ontology.json"))))
+    # A current smoker who skips the dose question must not be scored as smoking zero a day: since
+    # the contrast fix, smk_current no longer absorbs dose, so the bundle has to supply the neutral
+    # value rather than leaving the service to invent one.
+    cd = coefs.get("conditional_defaults", {})
+    checks.append(("bundle ships a smoker-conditional dose default",
+                   cd.get("cigs_day_when_current_smoker", 0) > 5))
     ev_any = json.load(open(os.path.join(broot, "evidence.json")))
     checks.append(("every graded factor carries an openable link",
                    all(v.get("url") for v in ev_any.values()

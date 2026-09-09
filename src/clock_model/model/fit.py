@@ -203,8 +203,17 @@ def fit_models(df: pd.DataFrame) -> dict:
         total_effect_data_only[lever] = {"mean": data_mean, "se": data_se}
         adjustment_sets[lever] = adj
 
+    # A current smoker who does not tell us the dose must not be scored as smoking zero a day.
+    # Since ONT-02 corrected the smoking contrast, smk_current no longer absorbs the dose effect,
+    # so that default became a real understatement rather than a rounding detail (REVIEW S9).
+    smokers = d[d["smoke"].astype(float) == 2]["cigs_day"].astype(float)
+    conditional_defaults = {
+        "cigs_day_when_current_smoker": float(smokers.mean()) if len(smokers) else 0.0,
+    }
+
     return {
         "prediction_coefs": prediction.to_dict(),
+        "conditional_defaults": conditional_defaults,
         "total_effect_coefs": total_effect,
         "total_effect_sd": total_effect_sd,
         "total_effect_source": total_effect_source,

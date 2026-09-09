@@ -56,6 +56,9 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
         "clipped_at_bound": fit.get("clipped_at_bound", []),
         "adjustment_sets": fit.get("adjustment_sets", {}),
         "strata": fit.get("strata", {}),
+        # Neutral values for optional inputs, so the service never has to invent one. A current
+        # smoker who skips the dose question is scored at the smokers' mean, not at zero.
+        "conditional_defaults": fit.get("conditional_defaults", {}),
         "attribution": fit.get("attribution_coefs", fit["total_effect_coefs"]),
         # Fitted standardizers + the literature features' published/declared ones, in one map, so
         # the service z-scores every continuous input the same way (and can validate coverage).
