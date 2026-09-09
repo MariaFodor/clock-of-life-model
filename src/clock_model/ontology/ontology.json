@@ -171,7 +171,7 @@
       "smk_current",
       "cigs_day"
     ],
-    "companion_reason": "Smoking is one categorical exposure encoded as never (reference) / former / current, plus a dose term for current smokers. Each indicator's coefficient only means what its citation means when the others are in the model — otherwise the reference group silently becomes 'everyone else' rather than 'never smoked'."
+    "companion_reason": "Smoking is one categorical exposure: never (reference) / former / current, plus a dose term for current smokers. Former-vs-never only means what Doll 2004 measured when the other indicators are in the model — otherwise the reference group silently becomes 'everyone else'."
   },
   "smk_current": {
     "role": "lever",
@@ -202,7 +202,8 @@
       "first_author": "Jha",
       "year": 2013,
       "verified": "2026-09-09",
-      "per": "binary"
+      "per": "marginal_current_vs_never",
+      "blend_note": "Not blended: the fitted coefficient conditions on dose, so it estimates a different contrast than this prior. Blending them over-stated every current smoker by about 0.07 log-HR."
     },
     "study": "smoking-cessation",
     "grade": "strong",
@@ -215,7 +216,7 @@
       "smk_former",
       "cigs_day"
     ],
-    "companion_reason": "Smoking is one categorical exposure encoded as never (reference) / former / current, plus a dose term for current smokers. Each indicator's coefficient only means what its citation means when the others are in the model — otherwise the reference group silently becomes 'everyone else' rather than 'never smoked'."
+    "companion_reason": "Fitted alongside smk_former and cigs_day so the reference group is 'never smoked'. Note the consequence: holding cigs_day fixed makes this coefficient 'a current smoker who smokes zero a day', a cell nobody occupies. It is therefore NOT the contrast Jha 2013 measured (current-vs-never at observed doses), which is why the prior is not blended into it."
   },
   "cigs_day": {
     "role": "lever",
@@ -252,7 +253,7 @@
       "smk_current",
       "smk_former"
     ],
-    "companion_reason": "Smoking is one categorical exposure encoded as never (reference) / former / current, plus a dose term for current smokers. Each indicator's coefficient only means what its citation means when the others are in the model — otherwise the reference group silently becomes 'everyone else' rather than 'never smoked'."
+    "companion_reason": "Smoking is one categorical exposure: never (reference) / former / current, plus a dose term for current smokers. Former-vs-never only means what Doll 2004 measured when the other indicators are in the model — otherwise the reference group silently becomes 'everyone else'."
   },
   "activity": {
     "role": "lever",
@@ -552,8 +553,7 @@
       "title": "Age-specific relevance of usual blood pressure to vascular mortality",
       "first_author": "Prospective Studies Collaboration",
       "year": 2002,
-      "verified": "2026-09-09",
-      "per": "per_20mmHg"
+      "verified": "2026-09-09"
     }
   },
   "diabetes": {
@@ -616,8 +616,7 @@
       "title": "Age-specific relevance of usual blood pressure to vascular mortality",
       "first_author": "Prospective Studies Collaboration",
       "year": 2002,
-      "verified": "2026-09-09",
-      "per": "binary"
+      "verified": "2026-09-09"
     }
   },
   "respiratory": {
@@ -645,8 +644,7 @@
       "title": "Global burden of COPD: systematic review and meta-analysis",
       "first_author": "Halbert",
       "year": 2006,
-      "verified": "2026-09-09",
-      "per": "binary"
+      "verified": "2026-09-09"
     }
   },
   "mobility": {
@@ -675,8 +673,7 @@
       "title": "Gait Speed and Survival in Older Adults",
       "first_author": "Studenski",
       "year": 2011,
-      "verified": "2026-09-09",
-      "per": "binary"
+      "verified": "2026-09-09"
     },
     "decision": "Classified as MARKER, not context: difficulty walking is downstream evidence of accumulated damage rather than a cause of death, so it predicts and explains but is never recommended or offered in What-If."
   },
@@ -706,8 +703,7 @@
       "title": "Association of Cardiometabolic Multimorbidity With Mortality",
       "first_author": "Di Angelantonio",
       "year": 2015,
-      "verified": "2026-09-09",
-      "per": "binary"
+      "verified": "2026-09-09"
     }
   },
   "cancer_hx": {
@@ -734,8 +730,7 @@
       "title": "Cancer treatment and survivorship statistics, 2019",
       "first_author": "Miller",
       "year": 2019,
-      "verified": "2026-09-09",
-      "per": "binary"
+      "verified": "2026-09-09"
     }
   },
   "env": {

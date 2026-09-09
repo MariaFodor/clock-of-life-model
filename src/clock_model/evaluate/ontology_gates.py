@@ -96,6 +96,15 @@ def check(fit: dict) -> list[tuple[str, bool, str]]:
         out.append((f"{lever}: fitted with its companion indicators", not missing,
                     f"missing: {missing}" if missing else ("n/a" if not companions else "complete")))
 
+    #    Companions must be declared symmetrically. Without this the gate is circular: it compares
+    #    the fit against the same declaration the fit was built from, so deleting the declaration
+    #    moves both together and the contrast silently reverts.
+    for key, spec in ont.items():
+        for companion in spec.get("companions", []):
+            back = ont.get(companion, {}).get("companions", [])
+            out.append((f"{key}/{companion}: companion declaration is symmetric", key in back,
+                        f"{companion} does not list {key}"))
+
     # 9. A declared clip or waiver must carry its reason. "Declared" without a reason is just a
     #    switch that silences the gate.
     for key, spec in ont.items():

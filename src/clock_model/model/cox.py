@@ -1,14 +1,14 @@
 """Fit the survival model with lifelines.
 
-Two models (per EXP-07/12): a PREDICTION model (all cohort predictors, with age-*interaction* terms —
-NOT age-stratified, and age itself is absent from the fit: see M11) for the Life-Clock
+Cohort assembly and the shared design helpers. The FITTING itself moved to `model/fit.py` in ONT-02
+(stratified by age band x sex, sign-constrained from the ontology); what remains here is the
+complete-case filter, the imputation entry point and the linear predictor
 number, and a TOTAL-EFFECT ATTRIBUTION model (modifiable levers only — no mediator conditioning) for
 "Why?"/What-If, so waist/sleep read honestly.
 """
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-from lifelines import CoxPHFitter
 
 from clock_model.config import features as F
 from clock_model.ingest import impute
@@ -20,10 +20,7 @@ NEEDS = ["smoke", "pa_min", "sleep", "waist", "diab", "hbp_told", "copd", "bronc
 IMPUTED = ["cigs_day", "sbp"]   # bmi dropped in REFIT-01 (collinear with waist — see features.py)
 
 # Levers-only design for the total-effect attribution model.
-LEVER_COLS = ["smk_former", "smk_current", "activity", "sleep_long", "waist",
-              "smk_current_x_young", "activity_x_young", "waist_x_young"]
 
-PENALIZER = 1e-4   # tiny ridge, matches the robust-fit stabilisation used in the experiments
 
 
 def complete_cohort(df: pd.DataFrame) -> pd.DataFrame:
@@ -31,16 +28,6 @@ def complete_cohort(df: pd.DataFrame) -> pd.DataFrame:
     d = df[NEEDS + IMPUTED].copy()
     d = d.dropna(subset=NEEDS)                     # essential predictors must be observed
     return d.reset_index(drop=True)
-
-
-def _fit(design: pd.DataFrame, T, E) -> dict:
-    d = design.copy()
-    d["pm"] = np.asarray(T, dtype=float)
-    d["dead"] = np.asarray(E, dtype=int)
-    cph = CoxPHFitter(penalizer=PENALIZER)
-    cph.fit(d, duration_col="pm", event_col="dead", robust=False)
-    return cph
-
 
 
 def fit_models(df):
