@@ -24,9 +24,10 @@ def main():
     # bound is what would catch a BMI reintroduction.
     checks.append(("C-index in [0.798, 0.812]", 0.798 <= g["c_index"] <= 0.812))
     checks.append(("bmi is not a fitted feature (REFIT-01)", "bmi" not in fit["prediction_coefs"]))
-    # The number What-If and Why? deliver must say a bigger waist is worse. (The *prediction*
-    # model's adjusted waist coefficient is negative — the EXP-12 mediator-adjustment artifact,
-    # tracked as M10; this check pins the half the product actually presents as a lever.)
+    # The number What-If and Why? deliver must say a bigger waist is worse. This gates the SIGN of
+    # the What-If/Why? half only: the headline Life Clock number is ungated on both known
+    # inversions (prediction waist, M10) and the magnitudes are inflated because neither fit
+    # adjusts for age or sex (M11). Both are registered owner decisions, not silent fixes.
     checks.append(("attribution: waist is correctly signed (bigger waist = worse)",
                    fit["attribution_coefs"]["waist"] > 0))
     checks.append(("attribution: smoking is correctly signed",

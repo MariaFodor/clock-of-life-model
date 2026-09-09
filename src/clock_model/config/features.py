@@ -11,9 +11,11 @@ itself slightly negative (-0.098 here; -0.136 in v2.0.0, i.e. this is the pre-BM
 new regression). That is the documented EXP-12 artifact — the prediction model conditions on
 diabetes, blood pressure and mobility, which are the very paths adiposity acts through, so the
 *direct* effect that survives adjustment is near zero and noisily negative. It is why attribution
-and What-If read the separate **total-effect** model, where waist is correctly +0.060. The
-consequence, stated plainly: for two users who answer identically except waist, the Life Clock
-number still moves the wrong way. Tracked as M10 — needs an owner decision, not a silent fix.
+and What-If read the separate **total-effect** model, where waist at least carries the right sign
+(+0.060) — though that magnitude is not trustworthy either, because neither fit adjusts for age or
+sex (M11); age/sex-adjusted it is ~+0.011 per SD. The consequence, stated plainly: for two users who
+answer identically except waist, the Life Clock number still moves the wrong way. Tracked as M10 —
+needs an owner decision, not a silent fix.
 
 
 Mirrors clock_dev/FEATURES_AND_QUESTIONS.md (the design deliverable) and the witnessed encodings from

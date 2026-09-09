@@ -36,7 +36,7 @@ newer NHANES cycles (and why each is/isn't trainable under 2019 follow-up), and 
 
 ## Validation (committed probes)
 - `tests/test_golden.py` — the lifelines pipeline reproduces the witnessed experiment numbers:
-  **C-index 0.793, calibration MAE 0.015**, avg-Romanian = national life expectancy. (No network.)
+  **C-index 0.805, calibration MAE 0.019**, avg-Romanian = national life expectancy. (No network.)
 - `tests/test_harmonize.py` — the raw-NHANES harmonizer reproduces the vendored `data/wide.json`:
   **20 columns exact**. Known approximate: `pa_min` (MET formula differs from the original derivation)
   and `pfq_diff` (multi-item combination) — they wash out under the log/threshold encodings; refining the
