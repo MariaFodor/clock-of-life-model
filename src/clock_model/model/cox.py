@@ -1,6 +1,7 @@
 """Fit the survival model with lifelines.
 
-Two models (per EXP-07/12): a PREDICTION model (all cohort predictors, age-stratified) for the Life-Clock
+Two models (per EXP-07/12): a PREDICTION model (all cohort predictors, with age-*interaction* terms —
+NOT age-stratified, and age itself is absent from the fit: see M11) for the Life-Clock
 number, and a TOTAL-EFFECT ATTRIBUTION model (modifiable levers only — no mediator conditioning) for
 "Why?"/What-If, so waist/sleep read honestly.
 """
@@ -16,7 +17,7 @@ NEEDS = ["smoke", "pa_min", "sleep", "waist", "diab", "hbp_told", "copd", "bronc
          "pfq_diff", "mi", "stroke", "chf", "cancer", "educ_hi", "income", "age", "sex", "pm", "dead"]
 # Self-reportable extras filled by training-only imputation (EXP-14); not part of the complete-case filter.
 # (alcohol is handled by the literature monotonic lever, not fitted here — see config/literature.py.)
-IMPUTED = ["bmi", "cigs_day", "sbp"]
+IMPUTED = ["cigs_day", "sbp"]   # bmi dropped in REFIT-01 (collinear with waist — see features.py)
 
 # Levers-only design for the total-effect attribution model.
 LEVER_COLS = ["smk_former", "smk_current", "activity", "sleep_long", "waist",
@@ -26,7 +27,7 @@ PENALIZER = 1e-4   # tiny ridge, matches the robust-fit stabilisation used in th
 
 
 def complete_cohort(df: pd.DataFrame) -> pd.DataFrame:
-    df = impute.impute_cohort(df)                 # fill bmi/alc_day/cigs_day (training-only, EXP-14)
+    df = impute.impute_cohort(df)                 # fill cigs_day/sbp (training-only, EXP-14)
     d = df[NEEDS + IMPUTED].copy()
     d = d.dropna(subset=NEEDS)                     # essential predictors must be observed
     return d.reset_index(drop=True)

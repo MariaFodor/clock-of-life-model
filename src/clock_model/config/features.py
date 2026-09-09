@@ -1,5 +1,23 @@
 """The confirmed feature set: roles, evidence, and the cohort encodings.
 
+**BMI is deliberately absent** (owner decision 2026-09-09, REFIT-01). It was briefly added in v2.1.0
+and produced exactly the artifact EXP-03/04/06 had rejected it for: BMI and waist are ~0.9
+correlated, so the pair fought and BMI won with a large NEGATIVE coefficient (-1.006 against waist's
++0.779). Waist is the adiposity measure; do not reintroduce BMI without a specification that
+prevents the collinearity.
+
+**What removing BMI does NOT fix:** the *adjusted* waist coefficient in the prediction model is
+itself slightly negative (-0.098 here; -0.136 in v2.0.0, i.e. this is the pre-BMI baseline, not a
+new regression). That is the documented EXP-12 artifact — the prediction model conditions on
+diabetes, blood pressure and mobility, which are the very paths adiposity acts through, so the
+*direct* effect that survives adjustment is near zero and noisily negative. It is why attribution
+and What-If read the separate **total-effect** model, where waist at least carries the right sign
+(+0.060) — though that magnitude is not trustworthy either, because neither fit adjusts for age or
+sex (M11); age/sex-adjusted it is ~+0.011 per SD. The consequence, stated plainly: for two users who
+answer identically except waist, the Life Clock number still moves the wrong way. Tracked as M10 —
+needs an owner decision, not a silent fix.
+
+
 Mirrors clock_dev/FEATURES_AND_QUESTIONS.md (the design deliverable) and the witnessed encodings from
 experiments/exp01/exp12. Cohort features are *fitted* from NHANES; literature features (config/literature)
 are *appended* with citations. Age/sex are NOT here — they go to the life-table baseline.
@@ -19,7 +37,6 @@ COHORT_FEATURES = [
     ("activity",     "lever",   "strong",   "WHO PA guidelines; dose-response meta-analyses"),
     ("sleep_long",   "lever",   "moderate", "Cappuccio 2010 sleep U-shape"),
     ("waist",        "lever",   "strong",   "central-adiposity mortality cohorts"),
-    ("bmi",          "lever",   "moderate", "BMI/adiposity mortality cohorts (adds to waist: low-BMI+high-waist = frailty)"),
     ("sbp",          "manage",  "strong",   "systolic blood-pressure mortality cohorts (adds to hbp_told)"),
     ("diabetes",     "manage",  "strong",   "diabetes mortality"),
     ("high_bp",      "manage",  "strong",   "hypertension mortality"),
@@ -34,7 +51,7 @@ COHORT_FEATURES = [
 INTERACTIONS = ["smk_current", "activity", "waist"]
 
 # Continuous features that are standardized; μ/σ are learned from training and shipped in the bundle.
-STANDARDIZED = ["activity", "waist", "income", "cigs_day", "bmi", "sbp"]
+STANDARDIZED = ["activity", "waist", "income", "cigs_day", "sbp"]
 
 
 def _raw_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -46,7 +63,6 @@ def _raw_columns(df: pd.DataFrame) -> pd.DataFrame:
     out["activity"]    = np.log(df["pa_min"].astype(float) + 1.0)          # log MET-minutes
     out["sleep_long"]  = (df["sleep"].astype(float) >= 8.5).astype(float)  # long-sleep flag (short dropped, EXP-12)
     out["waist"]       = df["waist"].astype(float)
-    out["bmi"]         = df["bmi"].astype(float)
     out["sbp"]         = df["sbp"].astype(float)                          # systolic BP (mmHg)
     out["diabetes"]    = df["diab"].astype(float)
     out["high_bp"]     = df["hbp_told"].astype(float)

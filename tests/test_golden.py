@@ -18,9 +18,20 @@ def main():
     checks = []
     checks.append(("n == 18839", fit["n"] == 18839))
     checks.append(("deaths == 2119", fit["deaths"] == 2119))
-    # Bumped from [0.785, 0.80] after adding the cohort BMI + current-smoking-dose + systolic-BP features
-    # (clock_dev EXP-14: +0.027 out-of-sample C-index). Alcohol stays a literature monotonic lever.
-    checks.append(("C-index in [0.812, 0.828]", 0.812 <= g["c_index"] <= 0.828))
+    # REFIT-01 dropped BMI (owner decision 2026-09-09): 0.820 -> 0.805. The lost 0.015 was bought
+    # by a large negative bmi coefficient fighting waist (r ~ 0.9). Band is tight because the fit is
+    # deterministic (three runs agree to 10 dp); it brackets the witnessed value, and its upper
+    # bound is what would catch a BMI reintroduction.
+    checks.append(("C-index in [0.798, 0.812]", 0.798 <= g["c_index"] <= 0.812))
+    checks.append(("bmi is not a fitted feature (REFIT-01)", "bmi" not in fit["prediction_coefs"]))
+    # The number What-If and Why? deliver must say a bigger waist is worse. This gates the SIGN of
+    # the What-If/Why? half only: the headline Life Clock number is ungated on both known
+    # inversions (prediction waist, M10) and the magnitudes are inflated because neither fit
+    # adjusts for age or sex (M11). Both are registered owner decisions, not silent fixes.
+    checks.append(("attribution: waist is correctly signed (bigger waist = worse)",
+                   fit["attribution_coefs"]["waist"] > 0))
+    checks.append(("attribution: smoking is correctly signed",
+                   fit["attribution_coefs"]["smk_current"] > 0))
     checks.append(("calibration MAE <= 0.02", g["calibration_mae"] <= 0.02))
 
     # centring: average Romanian ≈ national life expectancy at 40
