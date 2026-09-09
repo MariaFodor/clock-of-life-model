@@ -209,7 +209,6 @@ def fit_models(df: pd.DataFrame) -> dict:
         "total_effect_sd": total_effect_sd,
         "total_effect_source": total_effect_source,
         "total_effect_data_only": total_effect_data_only,
-        "total_effect_data_only": total_effect_data_only,
         "adjustment_sets": adjustment_sets,
         "clipped_at_bound": list(prediction.attrs.get("clipped_at_bound", [])),
         "standardizer": std,

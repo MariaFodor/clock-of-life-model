@@ -42,28 +42,19 @@ def _fit(design: pd.DataFrame, T, E) -> dict:
     return cph
 
 
-def fit_models(df: pd.DataFrame) -> dict:
-    """Returns the fitted artefacts needed for the bundle + evaluation."""
-    coh = complete_cohort(df)
-    standardizer = F.fit_standardizer(F._raw_columns(coh))
-    X = F.build_design(coh, standardizer)
-    T = coh["pm"].to_numpy(float)
-    E = coh["dead"].to_numpy(int)
 
-    prediction = _fit(X, T, E)
-    attribution = _fit(X[LEVER_COLS], T, E)
+def fit_models(df):
+    """Removed in ONT-02 — use `clock_model.model.fit.fit_models`.
 
-    return {
-        "cohort": coh,
-        "standardizer": standardizer,
-        "design": X,
-        "T": T, "E": E,
-        "prediction_coefs": {k: float(v) for k, v in prediction.params_.items()},
-        "attribution_coefs": {k: float(v) for k, v in attribution.params_.items()},
-        "prediction_cph": prediction,
-        "n": len(coh), "deaths": int(E.sum()),
-    }
-
+    The old fit had no age/sex strata and no sign constraints, so it reported smoking as protective
+    for the under-55s and adiposity as protective for everyone. Kept only as this refusal because
+    `train.py` went on calling it silently for one commit after the rewrite — which is exactly what
+    a dead function that still returns something invites.
+    """
+    raise RuntimeError(
+        "cox.fit_models was replaced by clock_model.model.fit.fit_models (ONT-02): the old fit was "
+        "unstratified and unconstrained, and reported smoking as protective for the young."
+    )
 
 def linear_predictor(design: pd.DataFrame, coefs: dict) -> np.ndarray:
     cols = list(coefs.keys())

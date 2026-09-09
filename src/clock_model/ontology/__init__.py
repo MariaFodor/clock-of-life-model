@@ -57,6 +57,11 @@ def adjustment_set(target: str, available: list[str], ont: dict | None = None) -
     ont = ont or ONT
     med = descendants(target, ont)
     conf = set(ont.get(target, {}).get("confounded_by", []))
+    # Companion indicators of the same categorical exposure are not confounders — they are part of
+    # the same variable. Leaving one out silently redefines the reference group (former vs "everyone
+    # else" instead of former vs never), which then gets blended with a prior measured against a
+    # different contrast.
+    conf |= set(ont.get(target, {}).get("companions", []))
     return [c for c in available
             if c != target and c in conf and c not in med and c not in ("age", "sex")]
 

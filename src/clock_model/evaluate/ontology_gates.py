@@ -86,7 +86,25 @@ def check(fit: dict) -> list[tuple[str, bool, str]]:
         out.append((f"{lever}: every declared confounder adjusted or waived", not missing,
                     f"unadjusted: {missing}" if missing else "complete"))
 
-    # 8. Every design column must be declared, or it is both unconstrained and ungated.
+    # 8. A lever whose prior is on the binary scale must be fitted alongside its companion
+    #    indicators, or the contrast it estimates is not the contrast the prior measured — the
+    #    reference group silently becomes "everyone else" instead of "never" (measured: it halved
+    #    the former-smoker effect).
+    for lever, adj in fit.get("adjustment_sets", {}).items():
+        companions = ont.get(lever, {}).get("companions", [])
+        missing = [c for c in companions if c not in adj]
+        out.append((f"{lever}: fitted with its companion indicators", not missing,
+                    f"missing: {missing}" if missing else ("n/a" if not companions else "complete")))
+
+    # 9. A declared clip or waiver must carry its reason. "Declared" without a reason is just a
+    #    switch that silences the gate.
+    for key, spec in ont.items():
+        if spec.get("clip_expected") and not spec.get("clip_reason"):
+            out.append((f"{key}: declared clip states its reason", False, "clip_reason missing"))
+        if spec.get("waived_confounders") and not spec.get("waiver_reason"):
+            out.append((f"{key}: waived confounders state their reason", False, "waiver_reason missing"))
+
+    # 10. Every design column must be declared, or it is both unconstrained and ungated.
     undeclared = sorted(k.replace("_x_young", "") for k in fit["prediction_coefs"]
                         if k.replace("_x_young", "") not in ont)
     out.append(("every fitted coefficient is declared in the ontology", not undeclared,

@@ -25,8 +25,8 @@ def main():
     # bound is what would catch a BMI reintroduction.
     # ONT-02 stratified the fit by age band x sex. The GLOBAL C-index drops (0.805 -> ~0.76)
     # because the model no longer ranks people using age confounding that leaked into the lever
-    # coefficients. The number that matters for the product — discrimination BETWEEN people of the
-    # same age and sex — went the other way: 0.666 -> 0.688.
+    # coefficients. The number that matters for the product — telling apart two people of the SAME
+    # age and sex — went the other way, and is asserted below rather than quoted here.
     checks.append(("C-index in [0.74, 0.78] (stratified; see note)", 0.74 <= g["c_index"] <= 0.78))
     checks.append(("bmi is not a fitted feature (REFIT-01)", "bmi" not in fit["prediction_coefs"]))
     # The number What-If and Why? deliver must say a bigger waist is worse. This gates the SIGN of
@@ -84,6 +84,22 @@ def main():
     checks.append(("data_as_of is the bare data-vintage date (service parses %Y-%m-%d)",
                    man["data_as_of"] == "2019-12-31"))
     checks.append(("data_vintage_note carries the prose context", "Eurostat" in man.get("data_vintage_note", "")))
+
+    # The product compares people of the same age and sex, so that is the discrimination to pin.
+    # A quoted figure in a comment drifts; this one is measured every run.
+    from lifelines.utils import concordance_index
+    import numpy as np
+    lp = (fit["design"][list(fit["prediction_coefs"])] * pd.Series(fit["prediction_coefs"])).sum(axis=1)
+    strata, T, E = fit["strata_labels"], fit["T"].to_numpy(), fit["E"].to_numpy()
+    tot = n = 0.0
+    for stratum in np.unique(strata):
+        m = strata == stratum
+        if E[m].sum() < 20:
+            continue
+        tot += concordance_index(T[m], -lp[m].to_numpy(), E[m]) * E[m].sum()
+        n += E[m].sum()
+    within = tot / n
+    checks.append((f"within-stratum C-index >= 0.68 (measured {within:.3f})", within >= 0.68))
 
     ok = all(p for _, p in checks)
     for name, p in checks:

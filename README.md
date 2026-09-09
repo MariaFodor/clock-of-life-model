@@ -8,7 +8,7 @@ repo (developed inside `clock_dev/`, which is a dev context, not committed).
 `fetch → ingest → features → fit → baselines → evaluate → export`, driven by one command:
 
 ```bash
-python -m clock_model.train --countries all --version 2.0.0     # full run → artifacts/model-v2.0.0/
+python -m clock_model.train --countries all --version 3.0.0     # full run → artifacts/model-v2.0.0/
 python -m clock_model.train --countries RO,DE,FR                # a subset
 python -m clock_model.train --check-updates                     # report newer upstream data
 python -m clock_model.train --from-raw                          # rebuild the cohort from raw NHANES
