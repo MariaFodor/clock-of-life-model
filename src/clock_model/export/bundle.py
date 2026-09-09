@@ -3,11 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from datetime import date
 
 from clock_model.config import features as F
 from clock_model.config.literature import LITERATURE
 from clock_model.config.cycles import MORT_FOLLOWUP_THROUGH
+from clock_model.config.countries import LIFETABLE_YEAR
 
 
 def _write(path: str, obj) -> None:
@@ -19,14 +19,31 @@ def _checksum(path: str) -> str:
     return hashlib.sha256(open(path, "rb").read()).hexdigest()[:16]
 
 
+def _merged_standardizer(fitted: dict) -> dict:
+    lit = {k: {"mean": v["standardizer"]["mean"], "sd": v["standardizer"]["sd"]}
+           for k, v in LITERATURE.items() if "standardizer" in v}
+    overlap = set(fitted) & set(lit)
+    if overlap:
+        raise SystemExit(f"[bundle] standardizer key(s) {sorted(overlap)} are both fitted and "
+                         "literature-declared — resolve which one ships before exporting")
+    return {**fitted, **lit}
+
+
 def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict) -> str:
     """countries: {ISO: {qx:{M,F}, reference_lp:{young,old}, national_le_40:{M,F}, prevalence}}."""
     root = os.path.join(out_dir, f"model-v{version}")
+    # Bundles are immutable (ADR-006): a change means a NEW version, never an in-place edit.
+    if os.path.exists(root):
+        raise SystemExit(f"[bundle] {root} already exists — bump the version instead of overwriting")
 
     coefficients = {
         "prediction": fit["prediction_coefs"],
         "attribution": fit["attribution_coefs"],
-        "standardizer": fit["standardizer"],
+        # Fitted standardizers + the literature features' published/declared ones, in one map, so
+        # the service z-scores every continuous input the same way (and can validate coverage).
+        # A key can only come from one side: if a future fit gains a column the literature also
+        # declares, that's a modelling decision, not a silent override.
+        "standardizer": _merged_standardizer(fit["standardizer"]),
         "literature": LITERATURE,
         "young_cutoff": F.YOUNG_CUTOFF,
     }
@@ -34,7 +51,10 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
 
     evidence = F.evidence_table()
     for k, v in LITERATURE.items():
-        evidence[k] = {"role": "lever", "grade": v["grade"], "citation": v["citation"]}
+        # ENV is CONTEXT for the personal clock (you don't "recommend" moving) and a lever only
+        # inside "Where Should I Live?" (THE_QUESTIONNAIRE.md S10); the rest are true levers.
+        role = "context" if k == "env" else "lever"
+        evidence[k] = {"role": role, "grade": v["grade"], "citation": v["citation"]}
     _write(os.path.join(root, "evidence.json"), evidence)
 
     for iso, b in countries.items():
@@ -75,7 +95,11 @@ base at stated confidence, not fitted on the cohort.
         "reference_population": "per-country (Eurostat)",
         "training_cohort": "NHANES 2007-2014 + NCHS Linked Mortality",
         "mortality_followup_through": MORT_FOLLOWUP_THROUGH,
-        "data_as_of": date.today().isoformat(),
+        # The DATA vintage, not the build date. Kept a bare ISO date — the service parses this
+        # into a DATE column (seed.rs %Y-%m-%d); the prose context goes in data_vintage_note.
+        "data_as_of": MORT_FOLLOWUP_THROUGH,
+        "data_vintage_note": f"mortality linkage through {MORT_FOLLOWUP_THROUGH}; "
+                             f"Eurostat life tables {LIFETABLE_YEAR}",
         "n": fit["n"], "deaths": fit["deaths"],
         "gates": gates,
         "countries": sorted(countries.keys()),

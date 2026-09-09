@@ -32,6 +32,27 @@ def main():
     le_avg = baselines.remaining_le(qxM, 40, 1.0)     # RR=1 by construction for the average
     checks.append(("avg-RO male LE@40 ≈ national 34.5", abs(le_avg - lt["LIFEXP_M"]["Y40"]) < 0.6))
 
+    # Bundle-content checks (LEV-01): the exported v2.2.0 artifact must carry the literature
+    # standardizers, centring references, the corrected env role, and a data-vintage stamp.
+    broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", "model-v2.2.0")
+    if not os.path.isdir(broot):
+        sys.exit("GOLDEN: PRECONDITION MISSING — artifacts/model-v2.2.0 not found. Generate it first:\n"
+                 "  PYTHONPATH=src .venv/bin/python reexport_offline.py --from-version 2.1.0 --version 2.2.0")
+    coefs = json.load(open(os.path.join(broot, "coefficients.json")))
+    ev = json.load(open(os.path.join(broot, "evidence.json")))
+    man = json.load(open(os.path.join(broot, "manifest.json")))
+    for k in ("diet", "sedentary", "stress"):
+        checks.append((f"standardizer ships {k}", k in coefs["standardizer"]
+                       and coefs["standardizer"][k]["sd"] > 0))
+        checks.append((f"literature {k} has a centring reference", "reference" in coefs["literature"][k]))
+    checks.append(("alcohol reference = light", coefs["literature"]["alcohol"]["reference"].get("level") == "light"))
+    checks.append(("env role is context", ev["env"]["role"] == "context"))
+    checks.append(("diet/alcohol/sedentary/stress stay levers",
+                   all(ev[k]["role"] == "lever" for k in ("diet", "alcohol", "sedentary", "stress"))))
+    checks.append(("data_as_of is the bare data-vintage date (service parses %Y-%m-%d)",
+                   man["data_as_of"] == "2019-12-31"))
+    checks.append(("data_vintage_note carries the prose context", "Eurostat" in man.get("data_vintage_note", "")))
+
     ok = all(p for _, p in checks)
     for name, p in checks:
         print(f"  [{'PASS' if p else 'FAIL'}] {name}")
