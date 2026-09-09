@@ -1,6 +1,7 @@
 """Fit the survival model with lifelines.
 
-Two models (per EXP-07/12): a PREDICTION model (all cohort predictors, age-stratified) for the Life-Clock
+Two models (per EXP-07/12): a PREDICTION model (all cohort predictors, with age-*interaction* terms —
+NOT age-stratified, and age itself is absent from the fit: see M11) for the Life-Clock
 number, and a TOTAL-EFFECT ATTRIBUTION model (modifiable levers only — no mediator conditioning) for
 "Why?"/What-If, so waist/sleep read honestly.
 """
