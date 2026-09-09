@@ -13,6 +13,7 @@ import pandas as pd
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
 from clock_model.model import cox, centring, fit as FIT
 from clock_model.evaluate import gates as G
+from clock_model.evaluate import ontology_gates as OG
 from clock_model.export import bundle
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +34,17 @@ def main() -> None:
           f"C-index={gates['c_index']} calibration={gates['calibration_mae']} passed={gates['passed']}")
     if not gates["passed"]:
         sys.exit("[reexport] GATES FAILED — bundle not written.")
+
+    # The ontology's own gates decide the release too, not just the numeric thresholds. Without
+    # this the module docstring's promise ("a violation refuses the release") was untrue: the checks
+    # existed but only the test suite ran them (PR#2 F2).
+    ont_results = OG.check(fit)
+    ont_failed = [f"{n}: {d}" for n, ok, d in ont_results if not ok]
+    if ont_failed:
+        for f in ont_failed:
+            print(f"[gate] REFUSED — {f}")
+        sys.exit(f"[gate] {len(ont_failed)} ontology gate(s) failed — bundle not written.")
+    print(f"[gate] {len(ont_results)} ontology gates passed")
 
     rates = centring.cohort_rates(fit["cohort"])
     src = os.path.join(ARTIFACTS, f"model-v{args.from_version}", "baselines")

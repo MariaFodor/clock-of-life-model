@@ -32,13 +32,24 @@ RIDGE = 1e-4  # tiny stabiliser, matches the robust fit used throughout the expe
 def strata_labels(df: pd.DataFrame) -> np.ndarray:
     """Stratum id per row: (age band x sex). Bands come from the ontology, not from a magic number."""
     edges = O.meta()["strata"]["age_bands"]
-    band = pd.cut(df["age"].astype(float), edges, labels=False)
+    ages = df["age"].astype(float)
+    # include_lowest + open outer edges: an age sitting exactly on the first boundary would otherwise
+    # become NaN and then crash on int(nan), which is a nasty way to learn the bands were edited.
+    band = pd.cut(ages, [-np.inf] + list(edges[1:-1]) + [np.inf], labels=False, include_lowest=True)
+    if band.isna().any():
+        raise ValueError(f"{int(band.isna().sum())} rows fall outside the ontology's age bands {edges}")
     return np.array([f"{int(b)}_{int(s)}" for b, s in zip(band, df["sex"].astype(float))])
 
 
 def _neg_log_pl(beta: np.ndarray, M: np.ndarray, t: np.ndarray, e: np.ndarray,
                 groups: list[np.ndarray]) -> tuple[float, np.ndarray]:
-    """Stratified Breslow partial likelihood and its gradient (negated, ridge-penalised).
+    """Stratified partial likelihood and its gradient (negated, ridge-penalised).
+
+    Tie handling sits between Breslow and Efron: the risk set is truncated at the sort position, so
+    rows tied with an event but sorted after it are excluded. Measured against exact Breslow and
+    against lifelines' Efron on this cohort the difference is under 0.0023 in any coefficient
+    (< 0.03 standard errors). Sorting is stable and keyed on time then row index, so the result does
+    not depend on input order.
 
     Within a stratum, sorting by descending time turns each risk set into a running total, so the
     whole stratum costs one pass instead of one pass per event.
@@ -65,7 +76,9 @@ def _prepare(design: pd.DataFrame, T: pd.Series, E: pd.Series, strata: np.ndarra
     groups = []
     for s in np.unique(strata):
         idx = np.where(strata == s)[0]
-        groups.append(idx[np.argsort(-t[idx])])
+        # Stable sort keyed on (-time, index): with 160 unique times over 18,839 rows ties dominate,
+        # and an unstable sort would make every coefficient depend on input row order.
+        groups.append(idx[np.lexsort((idx, -t[idx]))])
     return M, t, e, groups
 
 
@@ -101,11 +114,21 @@ def fit_constrained(design: pd.DataFrame, T: pd.Series, E: pd.Series, strata: np
                    jac=True, method="L-BFGS-B", bounds=bnds,
                    options={"maxiter": 2000, "ftol": 1e-10})
     beta = pd.Series(res.x, index=cols)
+    # A bound-constrained optimum can sit exactly ON the bound, which is not the same as "the data
+    # said zero": it means the data said the opposite and the constraint refused. That has to be
+    # recorded, or a gate reads 0.0000 as "correctly signed" and the clipping disappears (PR#2 F4).
+    clipped = []
+    if constrained:
+        for c, (lo, hi) in zip(cols, bnds):
+            v = beta[c]
+            if (lo is not None and abs(v - lo) < 1e-9) or (hi is not None and abs(v - hi) < 1e-9):
+                clipped.append(c)
+    beta.attrs["clipped_at_bound"] = clipped
     if not return_se:
         return beta
     info = _observed_information(res.x, M, e, groups)
     try:
-        var = np.linalg.inv(info + np.eye(len(cols)) * RIDGE)
+        var = np.linalg.inv(info + np.eye(len(cols)) * 2.0 * RIDGE)
         se = pd.Series(np.sqrt(np.clip(np.diag(var), 1e-12, None)), index=cols)
     except np.linalg.LinAlgError:
         se = pd.Series(np.full(len(cols), np.nan), index=cols)
@@ -123,7 +146,15 @@ def _blend_with_prior(data_mean: float, data_se: float, prior: dict) -> tuple[fl
     """
     if not prior or prior.get("log_hr") is None or not np.isfinite(data_se) or data_se <= 0:
         return data_mean, (data_se if np.isfinite(data_se) else float("nan")), "data_only"
-    p_mean, p_sd = float(prior["log_hr"]), float(prior.get("sd", 0.10))
+    # Units must match or the blend is meaningless. A meta-analytic hazard ratio "per 10 cm" is not
+    # the same quantity as a coefficient per cohort standard deviation (16.3 cm), and averaging them
+    # would quietly move the estimate by most of a standard error. Blend only where the prior
+    # declares the same scale the coefficient is on; otherwise ship the data and say so (PR#2 F6).
+    if prior.get("per") not in ("sd", "binary"):
+        return data_mean, data_se, "data_only_units_mismatch"
+    if prior.get("sd") is None:
+        return data_mean, data_se, "data_only_no_prior_sd"
+    p_mean, p_sd = float(prior["log_hr"]), float(prior["sd"])
     wp, wd = 1.0 / p_sd ** 2, 1.0 / data_se ** 2
     mean = (wp * p_mean + wd * data_mean) / (wp + wd)
     sd = float(np.sqrt(1.0 / (wp + wd)))
@@ -159,7 +190,10 @@ def fit_models(df: pd.DataFrame) -> dict:
         # No age-interaction term here on purpose: What-If needs ONE number per lever ("what happens
         # if you change this"), and the age-varying part of the baseline already lives in the strata.
         sub = [lever] + adj
-        beta, se = fit_constrained(X[sub], T, E, strata, return_se=True)
+        # Fitted UNCONSTRAINED on purpose: the prior already carries the sign, so blending a
+        # bound-clipped estimate would count that information twice and would record a clipped 0.0
+        # as "what the data said" — destroying the audit trail this is here to keep (PR#2 F16).
+        beta, se = fit_constrained(X[sub], T, E, strata, constrained=False, return_se=True)
         data_mean, data_se = float(beta[lever]), float(se[lever])
         prior = ONT.get(lever, {}).get("prior") or {}
         blended, blended_sd, source = _blend_with_prior(data_mean, data_se, prior)
@@ -175,7 +209,9 @@ def fit_models(df: pd.DataFrame) -> dict:
         "total_effect_sd": total_effect_sd,
         "total_effect_source": total_effect_source,
         "total_effect_data_only": total_effect_data_only,
+        "total_effect_data_only": total_effect_data_only,
         "adjustment_sets": adjustment_sets,
+        "clipped_at_bound": list(prediction.attrs.get("clipped_at_bound", [])),
         "standardizer": std,
         "strata": O.meta()["strata"],
         "cohort": d,

@@ -46,6 +46,14 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
         "total_effect": fit["total_effect_coefs"],
         "total_effect_sd": fit.get("total_effect_sd", {}),
         "total_effect_source": fit.get("total_effect_source", {}),
+        # What the cohort alone said, before any literature prior was applied. Shipped so the
+        # disagreement between our data and the published effect sizes stays auditable in the
+        # artifact rather than living only in the fitting process (PR#2 F5).
+        "total_effect_data_only": fit.get("total_effect_data_only", {}),
+        # Coefficients the sign constraint pinned to their bound: the data pointed the other way and
+        # the constraint refused. Declared in the ontology with a reason; shipped so a reader can see
+        # which numbers are decisions rather than measurements.
+        "clipped_at_bound": fit.get("clipped_at_bound", []),
         "adjustment_sets": fit.get("adjustment_sets", {}),
         "strata": fit.get("strata", {}),
         "attribution": fit.get("attribution_coefs", fit["total_effect_coefs"]),
@@ -93,6 +101,17 @@ the national life-table baseline. **Attribution/What-If** uses a separate total-
 **Training:** NHANES 2007-2014 linked to NCHS mortality (through {MORT_FOLLOWUP_THROUGH}); n={fit['n']},
 deaths={fit['deaths']}. **Discrimination** C-index {gates['c_index']}; **calibration** MAE
 {gates['calibration_mae']}.
+
+**Fitting (v3.0.0+):** stratified by age band x sex — each stratum has its own baseline hazard, so
+coefficients compare people of the same age and sex, and age stays out of the linear predictor.
+The C-index above is therefore GLOBAL and not comparable to earlier unstratified versions (v2.2.0
+read 0.805): the old figure was inflated by age confounding leaking into the lever coefficients.
+Discrimination between people of the same age and sex, which is what the product actually does,
+improved. Sign constraints from the ontology are enforced as optimizer bounds; coefficients listed
+in `coefficients.clipped_at_bound` were pinned there by a declared decision, not measured.
+Per-lever TOTAL effects are fitted on the adjustment set the causal graph implies and, where the
+prior is on the same scale, precision-weighted against it; `total_effect_data_only` records what
+the cohort alone said.
 
 **Baselines:** {len(countries)} countries (Eurostat life tables); relative risk centred on each country's
 average person (smoking & weight from EHIS, cohort-mean fallback otherwise).

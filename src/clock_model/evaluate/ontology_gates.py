@@ -59,10 +59,38 @@ def check(fit: dict) -> list[tuple[str, bool, str]]:
         out.append((f"{lever}: total effect adjusts for no mediator", not leak,
                     f"leaked: {leak}" if leak else "clean"))
 
-    # 5. Markers and context must never be advertised as recommendable.
-    levers = set(O.levers(ont))
-    bad = [k for k in levers if ont[k].get("role") != "lever"]
-    out.append(("only levers are recommendable", not bad, str(bad) if bad else "ok"))
+    # 5. Factors whose role was decided on evidence must keep it. Reading `levers()` back and
+    #    checking it contains only levers is a tautology — the real claim is that the specific
+    #    demotions made in ONT-01 have not been quietly undone (PR#2 F3).
+    for key, expected in (("sleep_long", "marker"), ("mobility", "marker"), ("env", "context")):
+        actual = ont.get(key, {}).get("role")
+        out.append((f"{key} is still classified as {expected}", actual == expected, str(actual)))
+
+    # 6. A coefficient pinned to its bound means the data pointed the other way and the constraint
+    #    refused. That is a finding, not a pass: without this the gate reads 0.0000 as "correctly
+    #    signed" and the clipping vanishes from the record (PR#2 F4).
+    clipped = fit.get("clipped_at_bound", [])
+    unexpected = [c for c in clipped if not ont.get(c.replace("_x_young", ""), {}).get("clip_expected")]
+    out.append(("every clipped coefficient is a declared decision, not a surprise", not unexpected,
+                f"undeclared clips: {unexpected}" if unexpected
+                else (f"declared: {clipped}" if clipped else "none clipped")))
+
+    # 7. A total effect is only causal if the confounders the graph declares were actually
+    #    available. Silently dropping the ones that are not cohort columns would present a
+    #    partially-adjusted estimate as a total effect (PR#2 F9).
+    for lever, adj in fit.get("adjustment_sets", {}).items():
+        declared = set(ont.get(lever, {}).get("confounded_by", [])) - {"age", "sex"}
+        med = O.descendants(lever, ont)
+        expected = declared - med
+        missing = sorted(expected - set(adj) - set(ont.get(lever, {}).get("waived_confounders", [])))
+        out.append((f"{lever}: every declared confounder adjusted or waived", not missing,
+                    f"unadjusted: {missing}" if missing else "complete"))
+
+    # 8. Every design column must be declared, or it is both unconstrained and ungated.
+    undeclared = sorted(k.replace("_x_young", "") for k in fit["prediction_coefs"]
+                        if k.replace("_x_young", "") not in ont)
+    out.append(("every fitted coefficient is declared in the ontology", not undeclared,
+                str(undeclared) if undeclared else "ok"))
     return out
 
 
