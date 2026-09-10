@@ -25,8 +25,8 @@
     "                verification date, and which claim it supports.",
     "  questions     interview question codes that feed this factor",
     "  standardizer  mean/sd/source for a z-scored factor",
-    "  levels / reference_level  the categories of a categorical factor, and which one is",
-    "                the reference the others are measured against",
+    "  levels / reference_level  a categorical factor's category -> log-HR map, and which",
+    "                category the others are measured against (its log-HR is 0)",
     "  prior_secondary  a second literature prior, held to the same citation bar as the first",
     "  note / decision / assumption / companion_reason / clip_reason / waiver_reason",
     "                prose the gates read for presence — a declared exception must say why"

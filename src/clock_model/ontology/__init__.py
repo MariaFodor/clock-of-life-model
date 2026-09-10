@@ -100,9 +100,14 @@ def citation_problems(ont: dict | None = None) -> list[str]:
         for field in ("prior", "prior_secondary"):
             if field not in spec:
                 continue
-            # `in`, not a None check, for the same reason as the block below: an explicit
-            # `"prior": null` is a declared prior declaring nothing, and it used to ship clean.
-            prior = spec.get(field) or {}
+            # `in`, not a None check, and shape-checked — the same treatment the block below gets.
+            # A declared `prior` that is null, or a bare DOI string where an object belongs, is a
+            # prior declaring nothing; the string case used to raise AttributeError mid-gate, which
+            # refuses the release for the wrong reason and without naming the field.
+            raw = spec.get(field)
+            if raw is not None and not isinstance(raw, dict):
+                problems.append(f"{key}.{field}: must be an object")
+            prior = raw if isinstance(raw, dict) else {}
             if not prior.get("doi") and not prior.get("url"):
                 problems.append(f"{key}.{field}: no doi/url")
             elif not prior.get("verified"):
