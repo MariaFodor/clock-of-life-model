@@ -171,6 +171,22 @@ def main():
           and reports(no_doi_no_verified, f"{FACTOR}.prior", "no doi/url"),
           "; ".join(no_doi_no_verified)[:70])
 
+    # The SOURCE arm of the same `elif`. Pinning the prior's and not this one is the third time this
+    # branch has fixed an asymmetry on one side only: last round the source was pinned and the prior
+    # was not, so the fix inverted it rather than ending it.
+    srcs = copy.deepcopy(good["sources"])
+    srcs[0].pop("doi")
+    srcs[0].pop("verified")
+    src_both = mutate(intervention_evidence={**good, "sources": srcs})
+    check("a SOURCE missing both doi and verification says so once, correctly",
+          len(src_both) == 1
+          and reports(src_both, f"{FACTOR}.intervention_evidence.sources[0]", "no doi/url"),
+          "; ".join(src_both)[:70])
+
+    # The prior's url fallback: the source's is pinned above, the prior's was not — same family.
+    check("a prior with a url and no doi is accepted",
+          not mutate(prior={"url": "https://doi.org/10.1136/bmj.m3324", "verified": "2026-09-10"}))
+
     # `continue` -> `break` is one token, and it stops the scan at the first malformed source, so
     # everything after it goes unreported and the author fixes one thing at a time.
     srcs = copy.deepcopy(good["sources"])
