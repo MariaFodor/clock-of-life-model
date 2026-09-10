@@ -71,9 +71,18 @@ def main():
     ARTIFACTS = os.path.join(os.path.dirname(__file__), "..", "artifacts")
     broot = os.path.join(ARTIFACTS, BUNDLE)
     if not os.path.isdir(broot):
-        prior = sorted(d for d in (os.listdir(ARTIFACTS) if os.path.isdir(ARTIFACTS) else [])
-                       if d.startswith("model-v")
-                       and os.path.isdir(os.path.join(ARTIFACTS, d, "baselines")))
+        # Keyed on the version components, not the string: sorted() puts model-v3.0.9 after
+        # model-v3.0.10, and would hand you the older bundle while claiming the newest.
+        def _ver(d):
+            return tuple(int(p) if p.isdigit() else -1 for p in d.split("model-v", 1)[1].split("."))
+        prior = sorted((d for d in (os.listdir(ARTIFACTS) if os.path.isdir(ARTIFACTS) else [])
+                        if d.startswith("model-v")
+                        # a baselines/ directory with nothing in it produces a 0-country bundle that
+                        # still exits 0, so emptiness disqualifies it as a source to reuse
+                        and os.path.isdir(os.path.join(ARTIFACTS, d, "baselines"))
+                        and any(f.endswith(".json")
+                                for f in os.listdir(os.path.join(ARTIFACTS, d, "baselines")))),
+                       key=_ver)
         how = (f"  PYTHONPATH=src python3 reexport_offline.py "
                f"--from-version {prior[-1].split('model-v', 1)[1]} --version {VERSION}"
                if prior else

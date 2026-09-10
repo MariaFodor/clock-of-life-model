@@ -37,9 +37,7 @@ newer NHANES cycles (and why each is/isn't trainable under 2019 follow-up), and 
 ## Validation (committed probes)
 - `tests/test_golden.py` — the lifelines pipeline reproduces the witnessed experiment numbers:
   **C-index 0.76, within-stratum 0.685, calibration MAE 0.013**, avg-Romanian = national life
-  expectancy. (No network, but it needs a built bundle — the test says how.) The figures here read
-  0.805 / 0.019 from before the age-and-sex-stratified refit, which is the same defect the test's own
-  precondition had: documentation left a revision behind the thing it documents.
+  expectancy. (No network, but it needs a built bundle — the test says how to build one.)
 - `tests/test_ontology_gates.py` — a malformed citation declaration is REPORTED, naming the field,
   rather than raising mid-gate. (No network, no bundle.)
 - `tests/test_harmonize.py` — the raw-NHANES harmonizer reproduces the vendored `data/wide.json`:
