@@ -61,18 +61,28 @@ def main():
 
     # Bundle-content checks (LEV-01): the shipped artifact must carry the literature standardizers,
     # centring references, the corrected env role, and a data-vintage stamp.
-    BUNDLE = "model-v3.0.2"
+    BUNDLE = "model-v3.0.3"
     broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", BUNDLE)
     if not os.path.isdir(broot):
         sys.exit(f"GOLDEN: PRECONDITION MISSING — artifacts/{BUNDLE} not found. Generate it first:\n"
-                 f"  PYTHONPATH=src python3 reexport_offline.py --from-version 3.0.1 --version 3.0.2")
+                 f"  PYTHONPATH=src python3 reexport_offline.py --from-version 3.0.2 --version 3.0.3")
     coefs = json.load(open(os.path.join(broot, "coefficients.json")))
     ont_path = os.path.join(broot, "ontology.json")
     checks.append(("bundle ships the ontology", os.path.exists(ont_path)))
     bundle_ont = json.load(open(ont_path)) if os.path.exists(ont_path) else {}
-    # The intervention evidence is the only citation the SERVICE renders that is not a factor's own
-    # prior, and it reaches the reader by the ontology travelling verbatim into the bundle. "Copied
-    # verbatim" is exactly the kind of thing that stays true until someone filters the copy.
+    # The ontology reaches the reader by travelling VERBATIM into the bundle, so that is what gets
+    # asserted — the whole file against its source, not a couple of fields.
+    #
+    # An earlier version of this check compared two DOI strings. It was green while the bundle was a
+    # revision behind the source in four other places, because those two strings had not changed:
+    # a stale verification date and the uncorrected `design` prose would both have shipped. A test
+    # for "copied verbatim" has to compare the copy with the original.
+    source_ont = json.load(open(os.path.join(os.path.dirname(__file__), "..", "src", "clock_model",
+                                             "ontology", "ontology.json")))
+    drift = sorted(k for k in set(source_ont) | set(bundle_ont)
+                   if source_ont.get(k) != bundle_ont.get(k))
+    checks.append((f"bundle's ontology is the source ontology, verbatim"
+                   + (f" (drifted: {drift})" if drift else ""), not drift))
     ie = (bundle_ont.get("cigs_day") or {}).get("intervention_evidence") or {}
     checks.append(("bundle ships cigs_day's intervention evidence",
                    {s.get("doi") for s in ie.get("sources", [])}

@@ -112,13 +112,19 @@ def citation_problems(ont: dict | None = None) -> list[str]:
         # An `intervention_evidence` block that declares nothing is worse than none at all: it
         # reads as "the model has sources for this" while shipping a clean bundle with zero. The
         # whole point is that something the model does not declare cannot be cited as the model's.
-        ie = spec.get("intervention_evidence")
-        if ie is not None:
+        # `in`, not `.get() is not None`: an explicit null is a declared block declaring nothing,
+        # which is the same defect shape as an empty source list.
+        if "intervention_evidence" in spec:
+            ie = spec.get("intervention_evidence") or {}
             if not ie.get("sources"):
                 problems.append(f"{key}.intervention_evidence: declared with no sources")
             if not ie.get("claim"):
                 problems.append(f"{key}.intervention_evidence: does not say what it is qualifying")
-        for i, src in enumerate((ie or {}).get("sources", [])):
+        sources = (spec.get("intervention_evidence") or {}).get("sources") or []
+        if not isinstance(sources, list):
+            problems.append(f"{key}.intervention_evidence.sources: must be a list")
+            sources = []
+        for i, src in enumerate(sources):
             where = f"{key}.intervention_evidence.sources[{i}]"
             if not src.get("doi") and not src.get("url"):
                 problems.append(f"{where}: no doi/url")

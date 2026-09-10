@@ -16,13 +16,18 @@
     "  study         slug into the service's study table",
     "  companions    other indicators of the SAME categorical exposure — kept together so the",
     "                reference group stays what the prior measured",
-    "  grade         strong | moderate | weak | na — the evidence grade shown to the reader",
+    "  grade         strong | strong_for_harm | moderate | weak | na — the evidence grade shown to the reader",
     "  clip_expected a sign constraint we EXPECT to bind, with clip_reason; an unexpected clip refuses",
     "  waived_confounders  declared confounders we cannot adjust for, with waiver_reason",
-    "  intervention_evidence  sources qualifying how a LEVER may be acted on, not the coefficient's",
+    "  intervention_evidence  sources qualifying how a factor may be ACTED ON, not the coefficient's",
     "                value — e.g. that cutting down is worth less than the per-cigarette slope",
-    "                implies. Same citation bar as prior: verified doi, and each source says which",
-    "                claim it supports."
+    "                implies. Requires a `claim`, and each source an openable doi-or-url, a",
+    "                verification date, and which claim it supports.",
+    "  questions     interview question codes that feed this factor",
+    "  standardizer  mean/sd for a z-scored factor; levels/reference_level for a categorical one",
+    "  prior_secondary  a second literature prior, held to the same citation bar as the first",
+    "  note / decision / assumption / companion_reason / clip_reason / waiver_reason",
+    "                prose the gates read for presence — a declared exception must say why"
   ],
   "_meta": {
     "version": "1.0.0",
@@ -286,7 +291,7 @@
           "design": "prospective cohort, 42,722 people, ~27-year follow-up"
         }
       ],
-      "why_cohort": "Cohort, deliberately not trials: reduction trials are powered for cessation, not mortality, so they cannot settle what reducing does to how long you live. The note said “trials” until review caught it."
+      "why_cohort": "Cohort rather than trial, for two different reasons. Reduction trials are powered for cessation, not mortality, so they cannot settle what cutting down does to how long you live. And nobody can randomise people to smoke, which is why the low-dose evidence is observational too."
     }
   },
   "activity": {
