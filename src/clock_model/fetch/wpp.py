@@ -99,7 +99,7 @@ class _Fingerprinted:
     def __init__(self, raw, limit: int = MAX_DECOMPRESSED):
         self._raw = raw
         self._hash = hashlib.sha256()
-        self._limit, self._seen = limit, 0
+        self._limit, self._seen = limit, 0   # wire-side ceiling; the decompressed side has its own
 
     def read(self, n=-1):
         chunk = self._raw.read(n)
@@ -112,6 +112,30 @@ class _Fingerprinted:
     @property
     def sha256(self) -> str:
         return self._hash.hexdigest()
+
+
+class _Budgeted(io.RawIOBase):
+    """Stop decompressing past a sane ceiling.
+
+    `readline()` assembles a whole line before csv.reader can object to anything, so a stream with no
+    newline in it expands without limit. The real files are ~4 GB decompressed.
+    """
+
+    def __init__(self, raw, limit: int = MAX_DECOMPRESSED):
+        self._raw, self._limit, self._seen = raw, limit, 0
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buf) -> int:
+        chunk = self._raw.read(len(buf))
+        if not chunk:
+            return 0
+        self._seen += len(chunk)
+        if self._seen > self._limit:
+            raise ValueError(f"decompressed past {self._limit} bytes — refusing to continue")
+        buf[:len(chunk)] = chunk
+        return len(chunk)
 
 
 def _stream_csv_gz(filename: str, on_row) -> str:
@@ -130,8 +154,13 @@ def _stream_csv_gz(filename: str, on_row) -> str:
         if resp.url.split(":", 1)[0] != "https":
             raise ValueError(f"refusing a redirect off https: {resp.url}")
         fp = _Fingerprinted(resp)
+        # Two budgets, because they guard different things. `fp` fingerprints and bounds the WIRE
+        # bytes; `_Budgeted` bounds what comes OUT of the decompressor, which is where a newline-free
+        # stream expands — measured at 401 MiB of heap from a 199 KiB response, with a wire-side
+        # counter reading 0.0024% of its limit.
+        raw = _Budgeted(gzip.GzipFile(fileobj=fp))
         # newline="" as the csv module requires: without it a quoted field containing CRLF is split.
-        with io.TextIOWrapper(gzip.GzipFile(fileobj=fp), encoding="utf-8-sig", newline="") as text:
+        with io.TextIOWrapper(io.BufferedReader(raw), encoding="utf-8-sig", newline="") as text:
             reader = csv.reader(text)
             head = next(reader)
             idx = {name: pos for pos, name in enumerate(head)}

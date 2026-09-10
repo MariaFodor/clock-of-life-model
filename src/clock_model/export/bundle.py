@@ -8,6 +8,7 @@ from clock_model.config import features as F
 from clock_model.config.literature import LITERATURE
 from clock_model.config.cycles import MORT_FOLLOWUP_THROUGH
 from clock_model.config.countries import LIFETABLE_YEAR
+from clock_model.fetch.wpp import ALIASES, LATEST_ESTIMATE_YEAR as WPP_YEAR
 from clock_model.ontology import _PATH as ONT_PATH
 
 
@@ -30,12 +31,22 @@ def _merged_standardizer(fitted: dict) -> dict:
     return {**fitted, **lit}
 
 
-def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict) -> str:
-    """countries: {ISO: {qx:{M,F}, reference_lp:{young,old}, national_le_40:{M,F}, prevalence}}."""
+def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict,
+             baseline_gates: list | None = None) -> str:
+    """countries: {ISO2: {qx:{M,F,B}, national_le_40, iso3, name, region, lifetable_year, source,
+    and — for the subset that can be scored — reference_lp + prevalence}}.
+
+    Two country lists come out of this, and keeping them apart is the point. `countries` in the
+    manifest stays what it has always been: the set the service may SCORE, which the service turns
+    into `/api/meta`'s country list. `reference_countries` is everything there is a life table for.
+    Widening the first to match the second would make every country scoreable against a US
+    cohort-mean reference person."""
     root = os.path.join(out_dir, f"model-v{version}")
     # Bundles are immutable (ADR-006): a change means a NEW version, never an in-place edit.
     if os.path.exists(root):
         raise SystemExit(f"[bundle] {root} already exists — bump the version instead of overwriting")
+
+    scoreable = sorted(iso for iso, b in countries.items() if b.get("reference_lp"))
 
     coefficients = {
         "prediction": fit["prediction_coefs"],
@@ -116,8 +127,12 @@ Per-lever TOTAL effects are fitted on the adjustment set the causal graph implie
 prior is on the same scale, precision-weighted against it; `total_effect_data_only` records what
 the cohort alone said.
 
-**Baselines:** {len(countries)} countries (Eurostat life tables); relative risk centred on each country's
-average person (smoking & weight from EHIS, cohort-mean fallback otherwise).
+**Baselines:** life tables for {len(countries)} countries or areas (UN World Population Prospects 2024,
+{WPP_YEAR} estimates, single year of age 0-100 by sex; CC BY 3.0 IGO). Of those, **{len(scoreable)} can be
+SCORED** — relative risk is centred on the country's average person using smoking and weight from
+Eurostat EHIS, and only those countries have it. The rest carry a life table so the atlas can draw
+them and are refused a personal estimate. Eurostat life tables ({LIFETABLE_YEAR}) are retained as the
+independent cross-source witness the release gates check against, not as a source.
 
 **Literature features** (diet, alcohol, sedentary, stress, environment) are appended from the evidence
 base at stated confidence, not fitted on the cohort.
@@ -136,20 +151,46 @@ base at stated confidence, not fitted on the cohort.
                 continue
             p = os.path.join(dirpath, name)
             checksums[os.path.relpath(p, root)] = _checksum(p)
+    sources = sorted({json.dumps(b["source"], sort_keys=True) for b in countries.values()
+                      if b.get("source")})
+    # The manifest below states UN WPP provenance as a literal. That is a claim about the DATA, so it
+    # has to be refused when the data cannot support it: re-exporting from a v3 bundle carries
+    # Eurostat baselines with no `source` at all, and would have shipped an EL-keyed, age-95 table
+    # under a manifest reading "UN World Population Prospects 2024".
+    sourceless = sorted(iso for iso, b in countries.items() if not b.get("source"))
+    if sourceless:
+        raise SystemExit(
+            f"[bundle] {len(sourceless)} baselines carry no source block ({sourceless[:5]}) — refusing "
+            f"to stamp this bundle with a provenance its data does not have. Rebuild with "
+            f"`train.py`, or re-export from a bundle that has one.")
     manifest = {
         "version": version,
         "algorithm": "cox_ph",
-        "reference_population": "per-country (Eurostat)",
+        "reference_population": "per-country (UN World Population Prospects 2024)",
         "training_cohort": "NHANES 2007-2014 + NCHS Linked Mortality",
         "mortality_followup_through": MORT_FOLLOWUP_THROUGH,
         # The DATA vintage, not the build date. Kept a bare ISO date — the service parses this
         # into a DATE column (seed.rs %Y-%m-%d); the prose context goes in data_vintage_note.
         "data_as_of": MORT_FOLLOWUP_THROUGH,
         "data_vintage_note": f"mortality linkage through {MORT_FOLLOWUP_THROUGH}; "
-                             f"Eurostat life tables {LIFETABLE_YEAR}",
+                             f"UN WPP 2024 life tables (estimates for {WPP_YEAR}); "
+                             f"Eurostat {LIFETABLE_YEAR} retained as the cross-source witness",
         "n": fit["n"], "deaths": fit["deaths"],
         "gates": gates,
-        "countries": sorted(countries.keys()),
+        # What the baseline gates actually checked, recorded rather than printed and discarded. Without
+        # this a reader cannot tell whether the cross-source witness covered sixty tables, ten, or none
+        # — and "Eurostat retained as the witness" in the vintage note would be unfalsifiable prose.
+        "baseline_gates": [{"name": n, "passed": ok, "detail": d}
+                           for n, ok, d in (baseline_gates or [])] or None,
+        # Scoreable. The service derives /api/meta from this, and an entry here is a promise that a
+        # person from that country can be given a number centred on their own population.
+        "countries": scoreable,
+        # Everything with a life table — what the atlas may draw. A superset of the above.
+        "reference_countries": sorted(countries.keys()),
+        # Eurostat calls Greece EL and ISO calls it GR. Stored calculations and deployed clients still
+        # say EL, so the service normalises through this rather than 400ing on a code it used to accept.
+        "country_aliases": dict(sorted(ALIASES.items())),
+        "sources": [json.loads(s) for s in sources],
         "checksums": checksums,
     }
     _write(os.path.join(root, "manifest.json"), manifest)
