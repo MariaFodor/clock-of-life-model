@@ -57,7 +57,12 @@ def main():
     lt = json.load(open(os.path.join(DATA, "RO_2024.json")))
     qxM = baselines.qx_from_eurostat_lifetable(lt["PROBDEATH_M"])
     le_avg = baselines.remaining_le(qxM, 40, 1.0)     # RR=1 by construction for the average
-    checks.append(("avg-RO male LE@40 ≈ national 34.5", abs(le_avg - lt["LIFEXP_M"]["Y40"]) < 0.6))
+    # This one is now entirely about the INTEGRATOR: both sides come from the vendored Eurostat file,
+    # so it says `remaining_le` reproduces a published `ex` from a published `qx`. It stops saying
+    # anything about the shipped baseline, which is UN WPP since v4.0.0 — that moved to the
+    # cross-source check below, where it belongs.
+    checks.append(("remaining_le reproduces Eurostat's own published LE@40 for RO",
+                   abs(le_avg - lt["LIFEXP_M"]["Y40"]) < 0.6))
 
     # Bundle-content checks (LEV-01): the shipped artifact must carry the literature standardizers,
     # centring references, the corrected env role, and a data-vintage stamp.
@@ -66,7 +71,7 @@ def main():
     # nothing. Naming it unconditionally printed an instruction that dies with FileNotFoundError on
     # exactly the checkout most likely to read it. Which command to print depends on what is on
     # disk, so the message asks the disk instead of assuming.
-    BUNDLE = "model-v3.0.3"
+    BUNDLE = "model-v4.0.0"
     VERSION = BUNDLE.split("model-v", 1)[1]
     ARTIFACTS = os.path.join(os.path.dirname(__file__), "..", "artifacts")
     broot = os.path.join(ARTIFACTS, BUNDLE)
@@ -91,6 +96,35 @@ def main():
                f"  PYTHONPATH=src python3 -m clock_model.train --countries all --version {VERSION}")
         sys.exit(f"GOLDEN: PRECONDITION MISSING — artifacts/{BUNDLE} not found. Generate it first,\n"
                  f"from the repository root:\n{how}")
+    # ── what the bundle now ships: two country lists, and a witness for the numbers ──────────────
+    manifest = json.load(open(os.path.join(broot, "manifest.json")))
+    checks.append((f"bundle draws {len(manifest.get('reference_countries', []))} countries and scores "
+                   f"{len(manifest.get('countries', []))}",
+                   len(manifest.get("reference_countries", [])) >= 230
+                   and len(manifest["countries"]) == 30))
+    # Scoreable must be a SUBSET. If the two lists ever merged, /api/meta would offer every country on
+    # the map and each non-European one would be scored against a US cohort-mean reference person.
+    checks.append(("every scoreable country is also drawable",
+                   set(manifest["countries"]) <= set(manifest.get("reference_countries", []))))
+    checks.append(("Eurostat's EL resolves to ISO's GR rather than 404ing an existing user",
+                   manifest.get("country_aliases", {}).get("EL") == "GR"
+                   and "GR" in manifest["countries"] and "EL" not in manifest["countries"]))
+    src = (manifest.get("sources") or [{}])[0]
+    checks.append(("the life-table source ships its licence, citation and retrieval date",
+                   src.get("licence") == "CC BY 3.0 IGO" and bool(src.get("citation"))
+                   and bool(src.get("retrieved")) and bool(src.get("files"))))
+    ro_base = json.load(open(os.path.join(broot, "baselines", "RO.json")))
+    # The cross-source witness, on the number that actually ships. Eurostat says 34.5 for Romanian men
+    # at 40; the shipped WPP baseline says ~34.0. Two agencies, one country, a declared band — which is
+    # a stronger claim than either one asserting itself. W-A1 measured the worst country at 1.73 yr.
+    checks.append(("the shipped RO baseline agrees with Eurostat's independent figure",
+                   abs(ro_base["national_le_40"]["M"] - lt["LIFEXP_M"]["Y40"]) < 2.0))
+    checks.append(("every shipped life table runs to 100, so no 95-year-old is priced at half a year",
+                   max(int(a) for a in ro_base["qx"]["M"]) == 100
+                   and baselines.remaining_le({int(a): q for a, q in ro_base["qx"]["M"].items()}, 95, 1.0) > 1.0))
+    checks.append(("a reference-only country carries a life table and no centring",
+                   "reference_lp" not in json.load(open(os.path.join(broot, "baselines", "NG.json")))))
+
     coefs = json.load(open(os.path.join(broot, "coefficients.json")))
     ont_path = os.path.join(broot, "ontology.json")
     checks.append(("bundle ships the ontology", os.path.exists(ont_path)))

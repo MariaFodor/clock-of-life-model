@@ -8,6 +8,7 @@ from clock_model.config import features as F
 from clock_model.config.literature import LITERATURE
 from clock_model.config.cycles import MORT_FOLLOWUP_THROUGH
 from clock_model.config.countries import LIFETABLE_YEAR
+from clock_model.fetch.wpp import ALIASES, LATEST_ESTIMATE_YEAR as WPP_YEAR
 from clock_model.ontology import _PATH as ONT_PATH
 
 
@@ -31,7 +32,14 @@ def _merged_standardizer(fitted: dict) -> dict:
 
 
 def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict) -> str:
-    """countries: {ISO: {qx:{M,F}, reference_lp:{young,old}, national_le_40:{M,F}, prevalence}}."""
+    """countries: {ISO2: {qx:{M,F,B}, national_le_40, iso3, name, region, lifetable_year, source,
+    and — for the subset that can be scored — reference_lp + prevalence}}.
+
+    Two country lists come out of this, and keeping them apart is the point. `countries` in the
+    manifest stays what it has always been: the set the service may SCORE, which the service turns
+    into `/api/meta`'s country list. `reference_countries` is everything there is a life table for.
+    Widening the first to match the second would make every country scoreable against a US
+    cohort-mean reference person."""
     root = os.path.join(out_dir, f"model-v{version}")
     # Bundles are immutable (ADR-006): a change means a NEW version, never an in-place edit.
     if os.path.exists(root):
@@ -136,20 +144,32 @@ base at stated confidence, not fitted on the cohort.
                 continue
             p = os.path.join(dirpath, name)
             checksums[os.path.relpath(p, root)] = _checksum(p)
+    scoreable = sorted(iso for iso, b in countries.items() if b.get("reference_lp"))
+    sources = sorted({json.dumps(b["source"], sort_keys=True) for b in countries.values()
+                      if b.get("source")})
     manifest = {
         "version": version,
         "algorithm": "cox_ph",
-        "reference_population": "per-country (Eurostat)",
+        "reference_population": "per-country (UN World Population Prospects 2024)",
         "training_cohort": "NHANES 2007-2014 + NCHS Linked Mortality",
         "mortality_followup_through": MORT_FOLLOWUP_THROUGH,
         # The DATA vintage, not the build date. Kept a bare ISO date — the service parses this
         # into a DATE column (seed.rs %Y-%m-%d); the prose context goes in data_vintage_note.
         "data_as_of": MORT_FOLLOWUP_THROUGH,
         "data_vintage_note": f"mortality linkage through {MORT_FOLLOWUP_THROUGH}; "
-                             f"Eurostat life tables {LIFETABLE_YEAR}",
+                             f"UN WPP 2024 life tables (estimates for {WPP_YEAR}); "
+                             f"Eurostat {LIFETABLE_YEAR} retained as the cross-source witness",
         "n": fit["n"], "deaths": fit["deaths"],
         "gates": gates,
-        "countries": sorted(countries.keys()),
+        # Scoreable. The service derives /api/meta from this, and an entry here is a promise that a
+        # person from that country can be given a number centred on their own population.
+        "countries": scoreable,
+        # Everything with a life table — what the atlas may draw. A superset of the above.
+        "reference_countries": sorted(countries.keys()),
+        # Eurostat calls Greece EL and ISO calls it GR. Stored calculations and deployed clients still
+        # say EL, so the service normalises through this rather than 400ing on a code it used to accept.
+        "country_aliases": dict(sorted(ALIASES.items())),
+        "sources": [json.loads(s) for s in sources],
         "checksums": checksums,
     }
     _write(os.path.join(root, "manifest.json"), manifest)

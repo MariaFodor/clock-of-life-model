@@ -54,17 +54,17 @@ def main() -> None:
             continue
         iso = fn[:-5]
         prev = json.load(open(os.path.join(src, fn)))
-        prevalence = prev.get("prevalence")
-        built[iso] = {
-            "country": iso,
-            "qx": prev["qx"],
-            "reference_lp": {
+        # Carry the whole baseline forward and re-derive ONLY the centring, which is the one field
+        # that depends on the coefficients being re-fitted. Enumerating the fields to copy is how this
+        # script would quietly emit a bundle labelled v4 with v3-shaped contents — `Bundle::load`
+        # accepts it, and the missing identity/provenance would surface as a map with no country names.
+        built[iso] = dict(prev)
+        if prev.get("reference_lp") is not None:
+            prevalence = prev.get("prevalence")
+            built[iso]["reference_lp"] = {
                 "young": centring.reference_vector(fit["prediction_coefs"], rates, prevalence, age=40),
                 "old": centring.reference_vector(fit["prediction_coefs"], rates, prevalence, age=60),
-            },
-            "national_le_40": prev["national_le_40"],
-            "prevalence": prevalence,
-        }
+            }
     root = bundle.assemble(ARTIFACTS, args.version, fit, gates, built)
     print(f"[reexport] wrote {root}  ({len(built)} countries, {len(fit['prediction_coefs'])} coefficients)")
 

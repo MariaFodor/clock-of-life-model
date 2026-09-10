@@ -17,9 +17,10 @@ from clock_model.config.countries import LIFETABLE_YEAR
 from clock_model.model import cox, centring, baselines
 from clock_model.model import fit as FIT
 from clock_model.evaluate import gates as G
+from clock_model.evaluate import baseline_gates as BG
 from clock_model.evaluate import ontology_gates as OG
 from clock_model.export import bundle
-from clock_model.fetch import eurostat
+from clock_model.fetch import eurostat, wpp
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
@@ -34,27 +35,58 @@ def load_cohort(from_raw: bool) -> pd.DataFrame:
     return pd.DataFrame(json.load(open(os.path.join(DATA, "wide.json"))))
 
 
-def build_country_baseline(iso: str, coefs: dict, rates: dict) -> dict | None:
-    try:
-        lt = eurostat.fetch_lifetable(iso, LIFETABLE_YEAR)
-    except Exception as e:
-        print(f"  {iso}: life table unavailable ({e}); skipped")
-        return None
-    if not lt.get("M") or not lt.get("F"):
-        print(f"  {iso}: no life-table data for {LIFETABLE_YEAR}; skipped")
-        return None
-    prevalence = eurostat.fetch_prevalence(iso)
-    lp_young = centring.reference_vector(coefs, rates, prevalence, age=40)
-    lp_old = centring.reference_vector(coefs, rates, prevalence, age=60)
-    return {
-        "country": iso,
-        "qx": {"M": {str(a): q for a, q in lt["M"].items()},
-               "F": {str(a): q for a, q in lt["F"].items()}},
-        "reference_lp": {"young": lp_young, "old": lp_old},
-        "national_le_40": {"M": round(baselines.remaining_le(lt["M"], 40, 1.0), 2),
-                           "F": round(baselines.remaining_le(lt["F"], 40, 1.0), 2)},
-        "prevalence": prevalence,
-    }
+def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str]) -> dict:
+    """Every country the UN publishes a life table for, plus centring for the subset we can score.
+
+    Two populations in one directory, and the difference is not cosmetic. A baseline with a
+    `reference_lp` can be scored: `/api/meta` derives the country list from it, and the reader gets a
+    personal number. A baseline without one is REFERENCE ONLY — it exists so the map can draw it and
+    so a reader can see where their country sits, and the service must refuse to score against it.
+
+    The dividing line is prevalence, not life tables. Life tables now cover 237 countries; the Cox
+    reference person is centred on national smoking and overweight rates, and those come from Eurostat
+    EHIS, which covers Europe. Giving the other 200 a reference person built from US cohort means would
+    produce a confident, wrong, personal number for two-thirds of the world.
+    """
+    tables = wpp.fetch_lifetables()
+    places = wpp.fetch_locations()
+    source = wpp.source_metadata()
+    # Prevalence is fetched with the EUROSTAT code (EL), the baseline is keyed on the ISO one (GR).
+    by_iso = {wpp.resolve(geo): geo for geo in scoreable_geos}
+
+    built: dict[str, dict] = {}
+    for iso2, qx in tables.items():
+        place = places.get(iso2, {})
+        built[iso2] = {
+            "country": iso2,
+            "iso3": place.get("iso3"),
+            "name": place.get("name"),
+            "region": place.get("region"),
+            "lifetable_year": wpp.LATEST_ESTIMATE_YEAR,
+            "qx": {sex: {str(a): q for a, q in ages.items()} for sex, ages in qx.items()},
+            "national_le_40": {sex: round(baselines.remaining_le(ages, 40, 1.0), 2)
+                               for sex, ages in qx.items()},
+            "source": source,
+        }
+        geo = by_iso.get(iso2)
+        if geo is None:
+            continue
+        prevalence = eurostat.fetch_prevalence(geo)
+        built[iso2]["prevalence"] = prevalence
+        # Switzerland publishes no EHIS figures, so its reference person falls back to the cohort
+        # mean — which is what ships today. Keeping it scoreable preserves that; RECORDING the
+        # fallback is what stops it being invisible, and the gate refuses an undeclared one.
+        built[iso2]["prevalence_source"] = (
+            f"Eurostat EHIS ({geo})" if prevalence
+            else f"cohort-mean fallback — EHIS publishes no usable figures for {geo}")
+        built[iso2]["reference_lp"] = {
+            "young": centring.reference_vector(coefs, rates, prevalence, age=40),
+            "old": centring.reference_vector(coefs, rates, prevalence, age=60),
+        }
+    missing = sorted(set(by_iso) - set(built))
+    if missing:
+        raise SystemExit(f"[train] {len(missing)} scoreable countries have no WPP life table: {missing}")
+    return built
 
 
 def train(country_list, version, from_raw=False):
@@ -79,13 +111,27 @@ def train(country_list, version, from_raw=False):
         sys.exit("[train] GATES FAILED — bundle not exported.")
 
     rates = centring.cohort_rates(fit["cohort"])
-    print(f"[train] building baselines for {len(country_list)} countries …")
-    built = {}
-    for iso in country_list:
-        b = build_country_baseline(iso, fit["prediction_coefs"], rates)
-        if b:
-            built[iso] = b
-    print(f"        built {len(built)} country baselines")
+    print(f"[train] building baselines (life tables for every country, centring for {len(country_list)}) …")
+    built = build_baselines(fit["prediction_coefs"], rates, country_list)
+    scoreable = [iso for iso, b in built.items() if b.get("reference_lp")]
+    print(f"        built {len(built)} baselines, {len(scoreable)} of them scoreable")
+
+    # The independent witness: Eurostat is no longer a source, and this is the job it keeps. Fetched
+    # per country and allowed to be incomplete — the gate decides whether what it covered is enough.
+    witness = {}
+    for geo in country_list:
+        try:
+            witness[geo] = eurostat.fetch_lifetable(geo, LIFETABLE_YEAR)
+        except Exception as e:                                    # noqa: BLE001
+            print(f"        witness: {geo} unavailable ({e})")
+    bl_failed = [f"{n}: {d}" for n, ok, d in BG.check(built, witness=witness) if not ok]
+    if bl_failed:
+        for f in bl_failed:
+            print(f"[gate] REFUSED — {f}")
+        # Not `continue`, and not a per-country skip: a life table that fails a gate is a wrong number
+        # for a real person, and the only safe response is to ship nothing.
+        sys.exit(f"[gate] {len(bl_failed)} baseline gate(s) failed — bundle not written.")
+    print(f"[gate] baseline gates passed ({len(built)} countries)")
 
     root = bundle.assemble(ARTIFACTS, version, fit, gates, built)
     print(f"[train] bundle → {root}")
