@@ -24,7 +24,9 @@
     "                implies. Requires a `claim`, and each source an openable doi-or-url, a",
     "                verification date, and which claim it supports.",
     "  questions     interview question codes that feed this factor",
-    "  standardizer  mean/sd for a z-scored factor; levels/reference_level for a categorical one",
+    "  standardizer  mean/sd/source for a z-scored factor",
+    "  levels / reference_level  the categories of a categorical factor, and which one is",
+    "                the reference the others are measured against",
     "  prior_secondary  a second literature prior, held to the same citation bar as the first",
     "  note / decision / assumption / companion_reason / clip_reason / waiver_reason",
     "                prose the gates read for presence — a declared exception must say why"

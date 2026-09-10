@@ -98,33 +98,40 @@ def citation_problems(ont: dict | None = None) -> list[str]:
     problems = []
     for key, spec in (ont or ONT).items():
         for field in ("prior", "prior_secondary"):
-            prior = spec.get(field)
-            if prior is None:
+            if field not in spec:
                 continue
+            # `in`, not a None check, for the same reason as the block below: an explicit
+            # `"prior": null` is a declared prior declaring nothing, and it used to ship clean.
+            prior = spec.get(field) or {}
             if not prior.get("doi") and not prior.get("url"):
                 problems.append(f"{key}.{field}: no doi/url")
             elif not prior.get("verified"):
                 problems.append(f"{key}.{field}: doi present but never verified")
         # Evidence that qualifies an INTERVENTION rather than the coefficient itself — the sources
-        # behind "cutting down is not quitting", say. It is held to the same bar: this is the
-        # evidence a user reads on screen, and it lived in the service's source code until the
-        # model claimed it. Something the model does not declare cannot be cited as the model's.
-        # An `intervention_evidence` block that declares nothing is worse than none at all: it
-        # reads as "the model has sources for this" while shipping a clean bundle with zero. The
-        # whole point is that something the model does not declare cannot be cited as the model's.
-        # `in`, not `.get() is not None`: an explicit null is a declared block declaring nothing,
-        # which is the same defect shape as an empty source list.
+        # behind "cutting down is not quitting", say. Held to the same bar as a prior, because this
+        # is evidence a user reads on screen and something the model does not declare cannot be
+        # cited as the model's.
+        #
+        # Keyed on `in` rather than on the value being non-None, and shape-checked besides: a block
+        # that is null, empty, or the wrong type is a block declaring nothing while reading as
+        # "the model has sources for this", which is the defect rather than the absence of one.
+        raw_ie = spec.get("intervention_evidence")
+        ie = raw_ie if isinstance(raw_ie, dict) else {}
         if "intervention_evidence" in spec:
-            ie = spec.get("intervention_evidence") or {}
+            if raw_ie is not None and not isinstance(raw_ie, dict):
+                problems.append(f"{key}.intervention_evidence: must be an object")
             if not ie.get("sources"):
                 problems.append(f"{key}.intervention_evidence: declared with no sources")
             if not ie.get("claim"):
                 problems.append(f"{key}.intervention_evidence: does not say what it is qualifying")
-        sources = (spec.get("intervention_evidence") or {}).get("sources") or []
+        sources = ie.get("sources") or []
         if not isinstance(sources, list):
             problems.append(f"{key}.intervention_evidence.sources: must be a list")
             sources = []
         for i, src in enumerate(sources):
+            if not isinstance(src, dict):
+                problems.append(f"{key}.intervention_evidence.sources[{i}]: not an object")
+                continue
             where = f"{key}.intervention_evidence.sources[{i}]"
             if not src.get("doi") and not src.get("url"):
                 problems.append(f"{where}: no doi/url")

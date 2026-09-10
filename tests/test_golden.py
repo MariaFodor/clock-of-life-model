@@ -61,11 +61,16 @@ def main():
 
     # Bundle-content checks (LEV-01): the shipped artifact must carry the literature standardizers,
     # centring references, the corrected env role, and a data-vintage stamp.
-    BUNDLE = "model-v3.0.3"
+    # artifacts/ is gitignored, so every fresh checkout takes this branch — the message below is the
+    # repo's only documented way to build a bundle, and it has to actually run. It named 3.0.2, which
+    # this branch deleted: an instruction left a revision behind the thing it describes, which is the
+    # defect the verbatim check further down exists to catch.
+    BUNDLE, BUNDLE_FROM = "model-v3.0.3", "3.0.1"
     broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", BUNDLE)
     if not os.path.isdir(broot):
         sys.exit(f"GOLDEN: PRECONDITION MISSING — artifacts/{BUNDLE} not found. Generate it first:\n"
-                 f"  PYTHONPATH=src python3 reexport_offline.py --from-version 3.0.2 --version 3.0.3")
+                 f"  PYTHONPATH=src python3 reexport_offline.py "
+                 f"--from-version {BUNDLE_FROM} --version {BUNDLE.removeprefix('model-v')}")
     coefs = json.load(open(os.path.join(broot, "coefficients.json")))
     ont_path = os.path.join(broot, "ontology.json")
     checks.append(("bundle ships the ontology", os.path.exists(ont_path)))
@@ -81,7 +86,7 @@ def main():
                                              "ontology", "ontology.json")))
     drift = sorted(k for k in set(source_ont) | set(bundle_ont)
                    if source_ont.get(k) != bundle_ont.get(k))
-    checks.append((f"bundle's ontology is the source ontology, verbatim"
+    checks.append(("bundle's ontology is the source ontology, verbatim"
                    + (f" (drifted: {drift})" if drift else ""), not drift))
     ie = (bundle_ont.get("cigs_day") or {}).get("intervention_evidence") or {}
     checks.append(("bundle ships cigs_day's intervention evidence",
@@ -94,9 +99,13 @@ def main():
     checks.append(("bundle ships a smoker-conditional dose default",
                    cd.get("cigs_day_when_current_smoker", 0) > 5))
     ev_any = json.load(open(os.path.join(broot, "evidence.json")))
+    # Anything but "na" is a grade shown to the reader, so anything but "na" needs a link. Listing
+    # the grades instead let `strong_for_harm` — alcohol's, and a documented value — slip the check
+    # silently. A closed list of what does NOT count is the safe direction: a new grade is covered
+    # the day it is invented rather than the day someone remembers to add it here.
+    ungraded = ("na", None)
     checks.append(("every graded factor carries an openable link",
-                   all(v.get("url") for v in ev_any.values()
-                       if v.get("grade") in ("strong", "moderate", "weak"))))
+                   all(v.get("url") for v in ev_any.values() if v.get("grade") not in ungraded)))
     ev = json.load(open(os.path.join(broot, "evidence.json")))
     man = json.load(open(os.path.join(broot, "manifest.json")))
     for k in ("diet", "sedentary", "stress"):
