@@ -121,7 +121,9 @@ def main():
     # fragment check goes on matching while the messages degrade freely. So: one defect, one
     # problem; and separate defects stay separate rather than arriving as one blob.
     one_defect = mutate(prior={k: v for k, v in ONT[FACTOR]["prior"].items() if k != "verified"})
-    check("one defect produces one problem", len(one_defect) == 1, f"{len(one_defect)}: {one_defect}")
+    check("one defect produces one problem, naming the field", len(one_defect) == 1
+          and reports(one_defect, f"{FACTOR}.prior", "never verified"),
+          f"{len(one_defect)}: {one_defect}")
 
     srcs = copy.deepcopy(good["sources"])
     srcs[0].pop("verified")
@@ -197,6 +199,48 @@ def main():
           reports(both, f"{FACTOR}.intervention_evidence.sources[0]", "not an object")
           and reports(both, f"{FACTOR}.intervention_evidence.sources[1]", "never verified"),
           "; ".join(both)[:70])
+
+    # Present-but-empty is not declared. `not X.get(k)` -> `"k" not in X` is one token and it lets
+    # a citation ship with `"doi": ""` or `"verified": null` — an unopenable citation, which is the
+    # thing this gate exists to say is not a citation. Both `raw is not None` guards are the same
+    # shape: drop them and a null block stops being reported as null.
+    for label, bad in (
+            ("doi and url both empty", {**ONT[FACTOR]["prior"], "doi": "", "url": ""}),
+            ("verified null", {**ONT[FACTOR]["prior"], "verified": None}),
+            ("verified empty", {**ONT[FACTOR]["prior"], "verified": ""})):
+        check(f"a prior with {label} is reported",
+              reports(mutate(prior=bad), f"{FACTOR}.prior"), label)
+    # An empty `url` alongside a real doi is NOT a defect: the doi is what makes it openable, and a
+    # gate that rejected it would be demanding a field the format does not require.
+    check("an empty url alongside a good doi is accepted",
+          not mutate(prior={**ONT[FACTOR]["prior"], "url": ""}))
+    for field, empty in (("doi", ""), ("verified", None), ("supports", "")):
+        srcs = copy.deepcopy(good["sources"])
+        srcs[0][field] = empty
+        srcs[0].pop("url", None)
+        check(f"a source whose `{field}` is present but empty is reported",
+              reports(mutate(intervention_evidence={**good, "sources": srcs}),
+                      f"{FACTOR}.intervention_evidence.sources[0]"),
+              f"{field}={empty!r}")
+    # A null is a declared-nothing, not a wrong TYPE. Dropping the `is not None` guards makes the
+    # gate say "must be an object" about a null — and emit two problems for one defect, since the
+    # coerced {} then also reports no doi/url. Same class as the elif above: the message sends the
+    # author after a shape problem when the real one is an empty declaration.
+    for field in ("prior", "prior_secondary"):
+        null_one = mutate(**{field: None})
+        check(f"a null {field} is reported as empty, once, not as a wrong type",
+              len(null_one) == 1 and reports(null_one, f"{FACTOR}.{field}", "no doi/url")
+              and not any("must be an object" in p for p in null_one),
+              "; ".join(null_one)[:70])
+    null_ie = mutate(intervention_evidence=None)
+    check("a null intervention_evidence is reported as empty, not as a wrong type",
+          reports(null_ie, f"{FACTOR}.intervention_evidence", "declared with no sources")
+          and not any("must be an object" in p for p in null_ie),
+          "; ".join(null_ie)[:70])
+
+    check("a block whose `claim` is present but empty is reported",
+          reports(mutate(intervention_evidence={**good, "claim": ""}),
+                  f"{FACTOR}.intervention_evidence", "does not say what it is qualifying"))
 
     failed = [n for n, ok, _ in checks if not ok]
     print(f"\nONTOLOGY GATES: {'PASS' if not failed else 'FAIL'}  ({len(checks) - len(failed)}/{len(checks)})")
