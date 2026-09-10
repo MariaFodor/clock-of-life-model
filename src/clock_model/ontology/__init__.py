@@ -100,4 +100,16 @@ def citation_problems(ont: dict | None = None) -> list[str]:
                 problems.append(f"{key}.{field}: no doi/url")
             elif not prior.get("verified"):
                 problems.append(f"{key}.{field}: doi present but never verified")
+        # Evidence that qualifies an INTERVENTION rather than the coefficient itself — the sources
+        # behind "cutting down is not quitting", say. It is held to the same bar: this is the
+        # evidence a user reads on screen, and it lived in the service's source code until the
+        # model claimed it. Something the model does not declare cannot be cited as the model's.
+        for i, src in enumerate(spec.get("intervention_evidence", {}).get("sources", [])):
+            where = f"{key}.intervention_evidence.sources[{i}]"
+            if not src.get("doi") and not src.get("url"):
+                problems.append(f"{where}: no doi/url")
+            elif not src.get("verified"):
+                problems.append(f"{where}: doi present but never verified")
+            if not src.get("supports"):
+                problems.append(f"{where}: does not say WHICH claim it supports")
     return problems

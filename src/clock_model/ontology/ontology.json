@@ -253,7 +253,31 @@
       "smk_current",
       "smk_former"
     ],
-    "companion_reason": "Smoking is one categorical exposure: never (reference) / former / current, plus a dose term for current smokers. Former-vs-never only means what Doll 2004 measured when the other indicators are in the model — otherwise the reference group silently becomes 'everyone else'."
+    "companion_reason": "Smoking is one categorical exposure: never (reference) / former / current, plus a dose term for current smokers. Former-vs-never only means what Doll 2004 measured when the other indicators are in the model — otherwise the reference group silently becomes 'everyone else'.",
+    "intervention_evidence": {
+      "claim": "Cutting down is worth much less than the per-cigarette gradient implies, so a What-If that prices a dose reduction must say so.",
+      "why_here": "The fitted cigs_day coefficient is a linear per-cigarette slope estimated ACROSS smokers. Applied to a reduction it assumes someone who cuts down ends up like someone who always smoked that little, which the cohort evidence does not support. The service returns a note saying this; the sources for that note belong with the coefficient they qualify, not in the service's source code.",
+      "sources": [
+        {
+          "doi": "10.1093/aje/kwf150",
+          "title": "Smoking Reduction, Smoking Cessation, and Mortality: A 16-year Follow-up of 19,732 Men and Women from the Copenhagen Centre for Prospective Population Studies",
+          "first_author": "Godtfredsen",
+          "year": 2002,
+          "verified": "2026-09-10",
+          "supports": "reduction_without_cessation_shows_little_to_no_all_cause_mortality_benefit",
+          "design": "prospective cohort — deliberately NOT trials: reduction trials are powered for cessation, not mortality"
+        },
+        {
+          "doi": "10.1136/tc.2005.011932",
+          "title": "Health consequences of smoking 1-4 cigarettes per day",
+          "first_author": "Bjartveit",
+          "year": 2005,
+          "verified": "2026-09-10",
+          "supports": "dose_response_is_concave_the_first_few_cigarettes_carry_more_than_their_share",
+          "design": "prospective cohort, 42,722 people"
+        }
+      ]
+    }
   },
   "activity": {
     "role": "lever",
