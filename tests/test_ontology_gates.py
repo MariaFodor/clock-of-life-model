@@ -37,11 +37,15 @@ def main():
         print(f"  [{'PASS' if ok else 'FAIL'}] {name}" + (f" — {detail}" if detail else ""))
 
     def reports(problems, *must_contain):
-        """A problem must NAME the field. Asserting only that the list is non-empty let both
-        `must be an object` messages be deleted with the suite still green — and a gate that
-        refuses without saying which factor is wrong is barely better than the AttributeError it
-        replaced."""
-        return problems and all(any(frag in p for p in problems) for frag in must_contain)
+        """ONE problem must carry every fragment — the field path AND what is wrong with it.
+
+        Asserting only that the list is non-empty let both `must be an object` messages be deleted
+        with the suite still green. Testing each fragment against the list SEPARATELY was barely
+        better: a sibling problem supplies the field name, so dropping the name from a message — or
+        naming the wrong factor entirely — still passed. A gate that refuses without saying which
+        factor is wrong is barely better than the AttributeError it replaced.
+        """
+        return any(all(frag in p for frag in must_contain) for p in problems)
 
     check("the shipped ontology has no citation problems", not citation_problems())
 
@@ -72,11 +76,14 @@ def main():
               "; ".join(problems)[:70])
 
     # Each source is held to the prior's bar, plus a statement of what it supports.
-    for field in ("doi", "verified", "supports"):
+    for field, frag in (("doi", "no doi/url"), ("verified", "never verified"),
+                        ("supports", "does not say WHICH claim it supports")):
         srcs = copy.deepcopy(good["sources"])
         srcs[0].pop(field)
         problems = mutate(intervention_evidence={**good, "sources": srcs})
-        check(f"a source missing `{field}` is reported", problems, "; ".join(problems)[:70])
+        check(f"a source missing `{field}` is reported, naming the source",
+              reports(problems, f"{FACTOR}.intervention_evidence.sources[0]", frag),
+              "; ".join(problems)[:70])
 
     # A url is as openable as a doi.
     srcs = copy.deepcopy(good["sources"])
@@ -85,8 +92,9 @@ def main():
     check("a source with a url instead of a doi is accepted",
           not mutate(intervention_evidence={**good, "sources": srcs}))
 
-    check("a block with no claim is reported",
-          mutate(intervention_evidence={k: v for k, v in good.items() if k != "claim"}))
+    check("a block with no claim is reported, naming the block",
+          reports(mutate(intervention_evidence={x: v for x, v in good.items() if x != "claim"}),
+                  f"{FACTOR}.intervention_evidence", "does not say what it is qualifying"))
 
     # priors get the same treatment — this was asymmetric, and the string case raised.
     for label, value, frags in [
