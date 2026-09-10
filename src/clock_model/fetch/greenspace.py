@@ -15,8 +15,8 @@ only because the data leaves no alternative, and it is also what makes the join 
 on names alone missed Bucharest/Bucuresti and 144 other endonyms (383 joins by name, 527 by gazetteer).
 
 WHAT THIS CANNOT DO, stated because the product has to say it out loud. Only 63 of the 1,915 measured
-settlements inside the 30 scoreable countries have an NDVI value, and 24 of those 30 countries have
-exactly one green city — the capital. Stowell covers ~1,000 large cities worldwide and Europe's share is
+settlements inside the 30 scoreable countries have an NDVI value, and 22 of those 30 countries have
+exactly one green city — usually the capital. Stowell covers ~1,000 large cities worldwide and Europe's share is
 small. So `country_ndvi()` below derives a national figure from however many cities a country has, and
 records `cities` alongside it, because a "national greenness" built from one city has to be labelled as
 one rather than presented as a measurement of the country.
@@ -352,7 +352,7 @@ def country_ndvi(joined: dict, settlements: dict) -> dict:
 
     `{iso3: {ndvi, cities, year_min, year_max, derived_from}}`. This is the fallback the product shows
     where a settlement has no city measurement of its own, and it is NOT a measurement of the country:
-    24 of the 30 scoreable countries have exactly one green city, so `cities` travels with the value and
+    22 of the 30 scoreable countries have exactly one green city, so `cities` travels with the value and
     `derived_from` names them. The display obligation that follows is the owner's decision of
     2026-09-10 — every value carries the word for where it came from.
 

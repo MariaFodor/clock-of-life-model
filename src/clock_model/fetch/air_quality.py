@@ -41,7 +41,7 @@ TIMEOUT = 180
 #: Bumped whenever the filter, the column set or the cached payload's shape changes, so a stale extract
 #: built under different rules cannot be served as if it were this one. `fetch/wpp.py` documents the bug
 #: that earned this convention: adding a field without bumping produced a cache hit missing that field.
-CACHE_SCHEMA = 1
+CACHE_SCHEMA = 2
 
 CACHE = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "cache")
 
@@ -97,6 +97,18 @@ AAQ_SOURCE_URL = ("https://www.who.int/data/gho/data/themes/air-pollution/"
 #: WHO publishes PM10 and NO2 for settlements with no PM2.5. PM2.5 is the one the model prices, so it is
 #: the one that decides whether a settlement counts as measured.
 POLLUTANT = "pm25_concentration"
+
+#: Kosovo has four codes across the four files this product reads, and that is the whole of this table.
+#: WHO's air database says `KSV`; UN WPP and therefore the bundle say `XKX`; Natural Earth's geometry
+#: says `KOS`; the service's baseline file is `XK.json`. Measured rather than assumed: `KSV` is the ONLY
+#: ISO3 in either WHO file that the bundle has no life table for, so the alias is one entry and an empty
+#: alias table would be a silent loss of every Kosovan settlement rather than a general problem.
+#:
+#: Normalising here rather than downstream matters: the bundle gate refuses a settlement in a country it
+#: has no life table for, which is the check that found this. Without the alias, Kosovo's readings would
+#: have had to be DROPPED to get a bundle out — which is the same kind of quiet erasure as the atlas
+#: telling a Kosovan reader "no life table is published for this territory" while showing them one.
+ISO3_ALIASES = {"KSV": "XKX"}
 
 #: Owner decision 2026-09-10: the comparison window for air against greenness is 2020-2025. A settlement
 #: whose most recent PM2.5 reading predates it is not shown as a current measurement.
@@ -231,7 +243,7 @@ def fetch_country_pm25(refresh: bool = False) -> dict:
 
     latest: dict[str, int] = {}
     for row in body["value"]:
-        iso3, year = row.get("SpatialDim"), row.get("TimeDim")
+        iso3, year = ISO3_ALIASES.get(row.get("SpatialDim"), row.get("SpatialDim")), row.get("TimeDim")
         # The response mixes countries with WHO regions and World; only three-letter codes with a
         # COUNTRY spatial type are places a reader can live in.
         if row.get("SpatialDimType") != "COUNTRY" or not iso3 or len(iso3) != 3 or year is None:
@@ -240,7 +252,8 @@ def fetch_country_pm25(refresh: bool = False) -> dict:
 
     out: dict[str, dict] = {}
     for row in body["value"]:
-        iso3, year, area = row.get("SpatialDim"), row.get("TimeDim"), row.get("Dim1")
+        iso3 = ISO3_ALIASES.get(row.get("SpatialDim"), row.get("SpatialDim"))
+        year, area = row.get("TimeDim"), row.get("Dim1")
         if iso3 not in latest or int(year or -1) != latest[iso3] or area not in AREAS:
             continue
         value = row.get("NumericValue")
@@ -329,6 +342,7 @@ def fetch_city_pm25(refresh: bool = False) -> dict:
             # and cannot be checked against the country it claims. It is not a place here.
             continue
         iso3, city = r[idx["iso3"]], r[idx["city"]]
+        iso3 = ISO3_ALIASES.get(iso3, iso3)
         key = f"{iso3}|{city}"
         if key in best and best[key]["year"] >= year:
             continue

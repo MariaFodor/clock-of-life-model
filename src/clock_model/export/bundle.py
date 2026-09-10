@@ -21,6 +21,52 @@ def _checksum(path: str) -> str:
     return hashlib.sha256(open(path, "rb").read()).hexdigest()[:16]
 
 
+def _licences(env_sources: dict) -> list[dict]:
+    """Every licence the bundle's contents oblige, deduplicated, with the share-alike ones flagged.
+
+    `share_alike` is derived from the licence string rather than hand-marked: a new source added later
+    with an -SA licence must light this up without anyone remembering to.
+    """
+    seen = {}
+    for where, src in (env_sources or {}).items():
+        licence = (src or {}).get("licence")
+        if not licence:
+            continue
+        seen.setdefault(licence, {"licence": licence, "url": src.get("licence_url"),
+                                  "applies_to": [], "share_alike": "-sa" in licence.lower().replace(" ", "-"),
+                                  "non_commercial": "-nc" in licence.lower().replace(" ", "-")})
+        seen[licence]["applies_to"].append(where)
+    for v in seen.values():
+        v["applies_to"].sort()
+    return sorted(seen.values(), key=lambda v: v["licence"])
+
+
+def _validate_places(places: list, countries: dict) -> None:
+    """Refuse a places artifact that would put a fiction, or a silent zero, in front of a reader."""
+    if len(places) < 2000:
+        raise SystemExit(f"[bundle] only {len(places)} places — refusing a partial artifact")
+    iso3s = {b.get("iso3") for b in countries.values() if b.get("iso3")}
+    for rec in places:
+        where = f"{rec.get('iso3')}/{rec.get('city')}"
+        if rec["iso3"] not in iso3s:
+            raise SystemExit(f"[bundle] place {where} is in no country this bundle has a life table "
+                             "for — it could be drawn on the map with nothing behind it")
+        for field in ("city", "lat", "lon", "pm25", "pm25_year"):
+            if rec.get(field) in (None, ""):
+                raise SystemExit(f"[bundle] place {where} has no {field} — refusing")
+        # The failure this exists to stop: a greenness value present with no word for where it came
+        # from renders as a measurement of this city when it is the country's figure.
+        if (rec.get("ndvi") is None) != (rec.get("ndvi_basis") is None):
+            raise SystemExit(f"[bundle] place {where} has ndvi={rec.get('ndvi')} and basis="
+                             f"{rec.get('ndvi_basis')!r} — a value without its provenance, or the "
+                             "reverse; the screen cannot label this honestly")
+        if rec.get("ndvi_basis") not in (None, "city", "country"):
+            raise SystemExit(f"[bundle] place {where} has an unknown ndvi_basis "
+                             f"{rec['ndvi_basis']!r}")
+        if "illustrative" in str(rec.get("city", "")).lower():
+            raise SystemExit(f"[bundle] place {where} is still labelled illustrative")
+
+
 def _merged_standardizer(fitted: dict) -> dict:
     lit = {k: {"mean": v["standardizer"]["mean"], "sd": v["standardizer"]["sd"]}
            for k, v in LITERATURE.items() if "standardizer" in v}
@@ -32,7 +78,8 @@ def _merged_standardizer(fitted: dict) -> dict:
 
 
 def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict,
-             baseline_gates: list | None = None) -> str:
+             baseline_gates: list | None = None, places: list | None = None,
+             env_sources: dict | None = None) -> str:
     """countries: {ISO2: {qx:{M,F,B}, national_le_40, iso3, name, region, lifetable_year, source,
     and — for the subset that can be scored — reference_lp + prevalence}}.
 
@@ -107,6 +154,15 @@ def assemble(out_dir: str, version: str, fit: dict, gates: dict, countries: dict
     for iso, b in countries.items():
         _write(os.path.join(root, "baselines", f"{iso}.json"), b)
 
+    # The real settlements, as ONE artifact rather than one file per country. The service seeds its
+    # `location` table from this, and the picker reads it; splitting it per country would mean 85 files
+    # to checksum and a partial read that looks like a small country rather than a broken bundle.
+    if places is not None:
+        _validate_places(places, countries)
+        _write(os.path.join(root, "places.json"), places)
+
+    places_count = f"{len(places):,}" if places else "no"
+    places_countries = len({p["iso3"] for p in places}) if places else 0
     card = f"""# Model card — The Clock of Life v{version}
 
 **Algorithm:** Cox proportional hazards (interpretable), lifestyle + pathology predictors; age & sex to
@@ -136,6 +192,20 @@ independent cross-source witness the release gates check against, not as a sourc
 
 **Literature features** (diet, alcohol, sedentary, stress, environment) are appended from the evidence
 base at stated confidence, not fitted on the cohort.
+
+**Exposure reference (v4.1.0+):** each baseline carries `env_reference` — the measured air and greenness
+an average person in that country is exposed to, which is what the environment term is CENTRED on. Air:
+WHO Global Health Observatory `SDGPM25`, population-weighted and split by residence area (total / urban /
+rural / city / town), so a reader in a village is not centred on a capital-city average. Greenness:
+population-weighted annual mean NDVI from Stowell et al. 2023 (CC0), derived from that country's own
+measured cities, with `ndvi_cities` recording how many — 22 of the 30 scoreable countries rest on ONE
+city, and the figure must be labelled as that rather than presented as a measurement of the country.
+`places.json` carries {places_count} real settlements in {places_countries} countries, each with its own
+PM2.5 reading and `ndvi_basis` saying whether its greenness is its own or its country's.
+
+**Inherited licence:** WHO's air data is CC BY-NC-SA 3.0 IGO — non-commercial and SHARE-ALIKE, and that
+obligation attaches to this bundle and to anything distributed containing it. `manifest.licences` states
+it so it travels with the artifact.
 
 **Intended use:** wellness/education only — a statistical estimate, never a prediction or diagnosis
 (ADR-001). Recommendations target modifiable/manageable factors only.
@@ -191,6 +261,23 @@ base at stated confidence, not fitted on the cohort.
         # say EL, so the service normalises through this rather than 400ing on a code it used to accept.
         "country_aliases": dict(sorted(ALIASES.items())),
         "sources": [json.loads(s) for s in sources],
+        # Where the exposure VALUES came from, beside where the exposure RESPONSE came from. The
+        # ontology could already cite Burnett 2014 for the coefficient; nothing in the artifact said
+        # what PM2.5 number that coefficient was being applied to, or when it was measured.
+        "env_sources": env_sources,
+        # The obligation this bundle INHERITS, stated rather than discovered. WHO's air data is
+        # CC BY-NC-SA 3.0 IGO: non-commercial (approved by the owner) and SHARE-ALIKE, which attaches
+        # to anything distributed containing it — this bundle, and the service that vendors it. Written
+        # into the manifest so the obligation travels with the artifact instead of living in a commit
+        # message nobody reads at distribution time.
+        "licences": _licences(env_sources) if env_sources else None,
+        "places": None if places is None else {
+            "count": len(places),
+            "countries": len({p["iso3"] for p in places}),
+            "with_city_greenness": sum(1 for p in places if p["ndvi_basis"] == "city"),
+            "with_country_greenness": sum(1 for p in places if p["ndvi_basis"] == "country"),
+            "without_greenness": sum(1 for p in places if p["ndvi_basis"] is None),
+        },
         "checksums": checksums,
     }
     _write(os.path.join(root, "manifest.json"), manifest)
