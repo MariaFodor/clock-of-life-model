@@ -30,6 +30,15 @@ MIN_COUNTRIES = 230
 #: The scoreable set is 30 hand-maintained European countries. Gating it at "non-empty" let
 #: `--countries RO` produce a fully green bundle that drops 29 countries out of /api/meta.
 MIN_SCOREABLE = 25
+
+#: The exposure reference is required for EVERY scoreable country, not for a count of them. An absolute
+#: threshold was the first draft and it is the wrong invariant: it passes a bundle where 30 countries
+#: carry a reference and two more are scoreable without one, which is precisely the case where a reader
+#: is priced against a reference that does not exist. `env_term` returns 0.0 when either input is None,
+#: which reads to a reader as "where you live makes no difference" and to a gate as a pass.
+#:
+#: Measured 2026-09-10: all 30 scoreable countries carry both a PM2.5 and an NDVI reference.
+REQUIRE_ENV_FOR_ALL_SCOREABLE = True
 #: The countries known to have no EHIS prevalence. An ALLOWLIST, not a predicate: the previous gate
 #: asked whether the fallback was declared, and `train.py` declares it in the same branch that
 #: creates it — so the gate was tautological with its only producer and could not fail. An EHIS
@@ -180,4 +189,49 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
             out.append(("an independent source agrees within the declared band", ok,
                         f"{len(pairs)} tables: median {med:.2f} yr, worst {worst_d:.2f} at "
                         f"{worst_iso}, rank corr {corr:.3f}"))
+    # ── The exposure reference ────────────────────────────────────────────────
+    # These gates exist because of what shipped without them: RO_PM25_REF = 14.0 against a measured
+    # 10.412, and RO_NDVI_REF = 0.5 against a measured 0.2539, both hardcoded in the service with a
+    # comment saying they must be replaced before the relocation surface ships. They were not.
+    scoreable = [iso for iso, b in baselines.items() if b.get("reference_lp")]
+    with_env = [iso for iso in scoreable
+                if (baselines[iso].get("env_reference") or {}).get("pm25") is not None]
+    # `and scoreable` so the gate cannot pass VACUOUSLY. "0 of 0 countries carry a reference" satisfies
+    # an equality and says nothing; MIN_SCOREABLE catches an empty bundle separately, but a gate that
+    # reports True over an empty set is a gate that will one day be the only one looking.
+    out.append((
+        "every scoreable country has a measured air reference",
+        bool(scoreable) and len(with_env) == len(scoreable),
+        f"{len(with_env)} of {len(scoreable)} scoreable countries carry a PM2.5 reference "
+        f"(missing: {sorted(set(scoreable) - set(with_env))[:5]})"))
+
+    green = [iso for iso in scoreable
+             if (baselines[iso].get("env_reference") or {}).get("ndvi") is not None]
+    out.append((
+        "every scoreable country has a greenness reference, and says how thin it is",
+        bool(scoreable) and len(green) == len(scoreable)
+        and all((baselines[iso]["env_reference"].get("ndvi_cities") or 0) >= 1 for iso in green),
+        f"{len(green)} of {len(scoreable)} carry an NDVI reference; "
+        f"{sum(1 for iso in green if baselines[iso]['env_reference']['ndvi_cities'] == 1)} of those "
+        f"rest on a single city and record it"))
+
+    # A value present with no provenance is the failure that puts an unlabelled country figure on a
+    # screen as if it were a measurement of that city.
+    unlabelled = [iso for iso, b in baselines.items()
+                  if (b.get("env_reference") or {}).get("ndvi") is not None
+                  and not (b["env_reference"].get("ndvi_derived_from"))]
+    out.append((
+        "no exposure value ships without the provenance the screen must show",
+        not unlabelled,
+        "every ndvi reference names the cities behind it" if not unlabelled
+        else f"{len(unlabelled)} carry an ndvi with no derived_from ({unlabelled[:5]})"))
+
+    # The bands are the adapters' own, re-asserted here: a bundle can be assembled from a cache written
+    # under older rules, and this is the last point before it ships.
+    bad = [f"{iso}={b['env_reference']['pm25']}" for iso, b in baselines.items()
+           if (b.get("env_reference") or {}).get("pm25") is not None
+           and not 1.0 <= b["env_reference"]["pm25"] <= 150.0]
+    out.append(("every air reference is a plausible concentration", not bad,
+                "all inside [1, 150] ug/m3" if not bad else f"outside the band: {bad[:5]}"))
+
     return out

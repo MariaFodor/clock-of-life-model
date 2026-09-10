@@ -80,10 +80,28 @@ def main() -> None:
         sys.exit(f"[gate] {len(failed)} baseline gate(s) failed — bundle not written.")
     print(f"[gate] {len(offline)} baseline gates passed; the cross-source witness was NOT re-run "
           f"(this path makes no network call — the bundle records that)")
+    # The places artifact and the exposure provenance are carried forward for the same reason the whole
+    # baseline is: enumerating what to copy is how this script emits a bundle labelled v4.1 whose
+    # contents are v4.0. Without this, a re-export would ship baselines carrying `env_reference` while
+    # the manifest had no `env_sources`, no inherited-licence block, and no places.json at all — the
+    # service would boot, find no settlements, and fall back to whatever its `location` table already
+    # held, which is the seven invented Romanian rows this work exists to delete.
+    prev_manifest_path = os.path.join(src.rstrip("/").rsplit("baselines", 1)[0], "manifest.json")
+    prev_places_path = os.path.join(src.rstrip("/").rsplit("baselines", 1)[0], "places.json")
+    places = json.load(open(prev_places_path)) if os.path.exists(prev_places_path) else None
+    env_sources = None
+    if os.path.exists(prev_manifest_path):
+        env_sources = json.load(open(prev_manifest_path)).get("env_sources")
+    if (places is None) != (env_sources is None):
+        sys.exit("[reexport] the source bundle has places.json XOR env_sources — refusing to emit a "
+                 "bundle with measured settlements whose provenance is missing, or the reverse")
+    print(f"[reexport] carried forward: "
+          f"{'no places artifact' if places is None else f'{len(places):,} settlements'}")
     root = bundle.assemble(ARTIFACTS, args.version, fit, gates, built,
                            baseline_gates=offline + [("an independent source agrees within the "
                                                       "declared band", False,
-                                                      "not re-run: offline re-export")])
+                                                      "not re-run: offline re-export")],
+                           places=places, env_sources=env_sources)
     print(f"[reexport] wrote {root}  ({len(built)} countries, {len(fit['prediction_coefs'])} coefficients)")
 
 

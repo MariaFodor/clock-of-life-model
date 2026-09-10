@@ -20,7 +20,7 @@ from clock_model.evaluate import gates as G
 from clock_model.evaluate import baseline_gates as BG
 from clock_model.evaluate import ontology_gates as OG
 from clock_model.export import bundle
-from clock_model.fetch import eurostat, wpp
+from clock_model.fetch import air_quality, eurostat, greenspace, wpp
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
@@ -35,7 +35,80 @@ def load_cohort(from_raw: bool) -> pd.DataFrame:
     return pd.DataFrame(json.load(open(os.path.join(DATA, "wide.json"))))
 
 
-def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str]) -> dict:
+def build_env_reference() -> tuple[dict, dict, dict]:
+    """The measured exposure reference per country, plus the real settlements behind it.
+
+    Returns `(by_iso3, places, sources)`:
+      * `by_iso3` — what an average person in that country is exposed to. This is the CENTRING
+        reference the scoring path needs: `env_term` prices a deviation from it, so a wrong reference
+        is a wrong number for every reader who has a home location. The service hardcodes
+        `RO_PM25_REF = 14.0` and `RO_NDVI_REF = 0.5` today against measured 10.412 and 0.2539.
+      * `places` — every settlement with a PM2.5 reading inside the comparison window, with its own
+        greenness where one exists and the country's where it does not. This is what replaces the
+        seven invented Romanian rows.
+      * `sources` — provenance for all three upstream files.
+
+    The air and greenness halves are NOT symmetrical and the asymmetry is carried rather than hidden.
+    Air is genuinely per-city: 3,522 settlements. Greenness exists for 426 of them, so the rest take
+    their country's derived figure and every value records which of the two it is — `ndvi_basis` is
+    `"city"` or `"country"`. A reader must be able to see that Bacau's greenness is Bucharest's.
+    """
+    country_pm = air_quality.fetch_country_pm25()
+    pm_source = country_pm.pop("_source")
+    cities = air_quality.fetch_city_pm25()
+    city_source = cities.pop("_source")
+    joined, report = greenspace.join_to_settlements(cities)
+    _, green_source = greenspace.fetch_city_ndvi()
+    derived = greenspace.country_ndvi(joined, cities)
+
+    by_iso3 = {}
+    for iso3, pm in country_pm.items():
+        green = derived.get(iso3)
+        by_iso3[iso3] = {
+            "pm25": pm["pm25"],
+            "pm25_low": pm.get("low"),
+            "pm25_high": pm.get("high"),
+            "pm25_year": pm["year"],
+            "pm25_by_area": pm["by_area"],
+            # None, not 0.0, where there is no measurement. A zero would be priced as "this country is
+            # barren"; the absence has to stay an absence all the way to the screen.
+            "ndvi": None if green is None else green["ndvi"],
+            "ndvi_year": None if green is None else green["year_max"],
+            "ndvi_cities": 0 if green is None else green["cities"],
+            "ndvi_weighted": None if green is None else green["weighted"],
+            "ndvi_derived_from": None if green is None else green["derived_from"],
+        }
+
+    places = []
+    for key, rec in cities.items():
+        g = joined.get(key)
+        fallback = derived.get(rec["iso3"])
+        places.append({
+            "iso3": rec["iso3"],
+            "city": rec["city"],
+            "lat": rec["lat"],
+            "lon": rec["lon"],
+            "population": rec.get("population"),
+            "pm25": rec["pm25"],
+            "pm25_year": rec["year"],
+            "pm25_stations": rec.get("stations"),
+            "pm25_temporal_coverage": rec.get("temporal_coverage"),
+            "ndvi": g["ndvi"] if g else (fallback["ndvi"] if fallback else None),
+            "ndvi_year": g["ndvi_year"] if g else (fallback["year_max"] if fallback else None),
+            # The word the screen has to show. Owner decision 2026-09-10: every value carries where it
+            # came from, because a country figure rendered bare reads as a measurement of this city.
+            "ndvi_basis": "city" if g else ("country" if fallback else None),
+            "ndvi_matched_city": g["matched_city"] if g else None,
+            "ndvi_distance_km": g["distance_km"] if g else None,
+        })
+    places.sort(key=lambda r: (r["iso3"], r["city"]))
+
+    sources = {"air_country": pm_source, "air_city": city_source, "greenspace": green_source,
+               "greenspace_join": {"tolerance_km": greenspace.TOLERANCE_KM, "report": report}}
+    return by_iso3, places, sources
+
+
+def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str], env: dict) -> dict:
     """Every country the UN publishes a life table for, plus centring for the subset we can score.
 
     Two populations in one directory, and the difference is not cosmetic. A baseline with a
@@ -68,6 +141,11 @@ def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str]) -> dict
                                for sex, ages in qx.items()},
             "source": source,
         }
+        # Keyed by ISO3 upstream, attached by ISO2 here. Absent for a country WHO has never measured —
+        # and absent is the right shape: the service must refuse to price an exposure it has no
+        # reference for rather than price it against someone else's country.
+        if place.get("iso3") in env:
+            built[iso2]["env_reference"] = env[place["iso3"]]
         geo = by_iso.get(iso2)
         if geo is None:
             continue
@@ -115,8 +193,12 @@ def train(country_list, version, from_raw=False):
         sys.exit("[train] GATES FAILED — bundle not exported.")
 
     rates = centring.cohort_rates(fit["cohort"])
+    print("[train] fetching measured exposures (WHO air, Stowell greenspace) …")
+    env, places, env_sources = build_env_reference()
+    print(f"        {len(env)} country references, {len(places):,} settlements, "
+          f"{sum(1 for p in places if p['ndvi_basis'] == 'city'):,} with their own greenness")
     print(f"[train] building baselines (life tables for every country, centring for {len(country_list)}) …")
-    built = build_baselines(fit["prediction_coefs"], rates, country_list)
+    built = build_baselines(fit["prediction_coefs"], rates, country_list, env)
     scoreable = [iso for iso, b in built.items() if b.get("reference_lp")]
     print(f"        built {len(built)} baselines, {len(scoreable)} of them scoreable")
 
@@ -138,7 +220,8 @@ def train(country_list, version, from_raw=False):
         sys.exit(f"[gate] {len(bl_failed)} baseline gate(s) failed — bundle not written.")
     print(f"[gate] baseline gates passed ({len(built)} countries)")
 
-    root = bundle.assemble(ARTIFACTS, version, fit, gates, built, baseline_gates=bl_results)
+    root = bundle.assemble(ARTIFACTS, version, fit, gates, built, baseline_gates=bl_results,
+                           places=places, env_sources=env_sources)
     print(f"[train] bundle → {root}")
     # sanity: RO average ≈ national LE
     if "RO" in built:

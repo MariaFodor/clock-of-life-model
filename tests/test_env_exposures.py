@@ -15,6 +15,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+from clock_model.export import bundle as B                # noqa: E402
+from clock_model.evaluate import baseline_gates as BG      # noqa: E402
 from clock_model.fetch import air_quality as A            # noqa: E402
 from clock_model.fetch import greenspace as G             # noqa: E402
 
@@ -199,9 +201,89 @@ def test_greenspace(cities: dict) -> None:
     check("the thinness is measured, not assumed: 47 of 76 rest on one city", thin == 47, f"{thin}")
 
 
+def test_bundle_refusals() -> None:
+    """The refusals that stand between a fiction and a reader, driven synthetically."""
+    print("\nbundle refusals (synthetic)")
+    countries = {"RO": {"iso3": "ROU"}}
+    ok_place = {"iso3": "ROU", "city": "Bucuresti", "lat": 44.4, "lon": 26.1, "pm25": 15.6,
+                "pm25_year": 2023, "ndvi": 0.25, "ndvi_basis": "city"}
+
+    def refuses(label: str, mutate: dict | None = None, *, drop: str | None = None,
+                iso3: str | None = None) -> None:
+        rec = dict(ok_place)
+        if mutate:
+            rec.update(mutate)
+        if drop:
+            rec[drop] = None
+        if iso3:
+            rec["iso3"] = iso3
+        # The city name is only renamed when the case under test is not ABOUT the name, otherwise this
+        # helper would overwrite the very mutation it was asked to check (it did, once).
+        places = [dict(rec) if "city" in (mutate or {}) else dict(rec) | {"city": f"c{i}"}
+                  for i in range(2500)]
+        try:
+            B._validate_places(places, countries)
+            check(label, False, "accepted")
+        except SystemExit:
+            check(label, True)
+
+    refuses("a place in a country with no life table is refused", iso3="KSV")
+    refuses("a place with no coordinates is refused", drop="lat")
+    refuses("a place with no pm25 year is refused", drop="pm25_year")
+    refuses("a greenness value with no provenance word is refused", {"ndvi_basis": None})
+    refuses("a provenance word with no greenness value is refused", {"ndvi": None})
+    refuses("an unknown provenance word is refused", {"ndvi_basis": "guessed"})
+    refuses("a place still labelled illustrative is refused", {"city": "Bucharest (ILLUSTRATIVE)"})
+    try:
+        B._validate_places([dict(ok_place) | {"city": f"c{i}"} for i in range(10)], countries)
+        check("a truncated places artifact is refused", False, "accepted 10 places")
+    except SystemExit:
+        check("a truncated places artifact is refused", True)
+
+    # The share-alike flag is derived, not hand-marked, so a source added later cannot quietly drop it.
+    lic = B._licences({"a": {"licence": "CC BY-NC-SA 3.0 IGO", "licence_url": "u"},
+                       "b": {"licence": "CC0 1.0", "licence_url": "v"}})
+    by = {l["licence"]: l for l in lic}
+    check("share-alike and non-commercial are derived from the licence string",
+          by["CC BY-NC-SA 3.0 IGO"]["share_alike"] and by["CC BY-NC-SA 3.0 IGO"]["non_commercial"]
+          and not by["CC0 1.0"]["share_alike"], str(lic))
+
+    # The gate must key on "every scoreable country", not on a count — the first draft used a count and
+    # would have passed a bundle with 30 references and 32 scoreable countries.
+    # String age keys, as the bundle stores them. Int keys here made BG.check raise KeyError('0')
+    # instead of returning a verdict — a synthetic fixture that does not match the real shape tests
+    # nothing.
+    qx = {sex: {str(a): (0.001 if a < 100 else 1.0) for a in range(101)} for sex in ("M", "F", "B")}
+    # A NON-EMPTY reference_lp, because an empty dict is falsy and the whole codebase tests scoreability
+    # with `if b.get("reference_lp")`. The first version of this fixture used {} and produced "0 of 0
+    # scoreable countries carry a reference" — a gate passing over an empty set, which is how the
+    # vacuous-pass hole in the gate itself was found.
+    baselines = {f"C{i:02d}": {"reference_lp": {"young": [0.0], "old": [0.0]},
+                               "iso3": f"C{i:02d}", "qx": qx, "prevalence": {},
+                               "env_reference": {"pm25": 10.0, "ndvi": 0.3, "ndvi_cities": 1,
+                                                 "ndvi_derived_from": ["x"]}} for i in range(30)}
+    # Scoreable, with a life table, and NO exposure reference at all. The gate keyed on a count of 30
+    # would pass this bundle; the gate keyed on "every scoreable country" must not.
+    baselines["ZZ"] = {"reference_lp": {"young": [0.0], "old": [0.0]}, "iso3": "ZZZ", "qx": qx,
+                       "prevalence": {}}
+    names = {n for n, ok, _ in BG.check(baselines) if not ok}
+    check("a scoreable country with no air reference fails the gate",
+          "every scoreable country has a measured air reference" in names, str(sorted(names)))
+    # And the gate must not pass over nothing. Driven with a bundle that HAS life tables but nothing
+    # scoreable — the shape this can really take. (`BG.check({})` on a wholly empty bundle raises
+    # StatisticsError from a median over no data; that is a pre-existing crash-instead-of-verdict in
+    # baseline_gates, registered rather than fixed here.)
+    reference_only = {iso: {k: v for k, v in b.items() if k != "reference_lp"}
+                      for iso, b in baselines.items()}
+    vacuous = {n for n, ok, _ in BG.check(reference_only) if not ok}
+    check("the air gate does not pass vacuously when nothing is scoreable",
+          "every scoreable country has a measured air reference" in vacuous, str(sorted(vacuous)))
+
+
 def main() -> int:
     print("W-B1a — air and greenspace adapters")
     test_refusals()
+    test_bundle_refusals()
     test_country_layer()
     cities = test_city_layer()
     test_greenspace(cities)
