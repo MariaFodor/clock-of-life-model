@@ -49,7 +49,7 @@ def build_env_reference() -> tuple[dict, dict, dict]:
       * `sources` — provenance for all three upstream files.
 
     The air and greenness halves are NOT symmetrical and the asymmetry is carried rather than hidden.
-    Air is genuinely per-city: 3,522 settlements. Greenness exists for 426 of them, so the rest take
+    Air is genuinely per-city: 3,521 settlements. Greenness exists for 426 of them, so the rest take
     their country's derived figure and every value records which of the two it is — `ndvi_basis` is
     `"city"` or `"country"`. A reader must be able to see that Bacau's greenness is Bucharest's.
     """

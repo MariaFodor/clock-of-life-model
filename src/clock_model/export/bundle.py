@@ -46,6 +46,16 @@ def _validate_places(places: list, countries: dict) -> None:
     if len(places) < 2000:
         raise SystemExit(f"[bundle] only {len(places)} places — refusing a partial artifact")
     iso3s = {b.get("iso3") for b in countries.values() if b.get("iso3")}
+    # The service stores these in a table with UNIQUE (iso3-derived country, name). A duplicate pair is
+    # not a cosmetic flaw there: Postgres refuses the whole batched insert, so the seeder fails and the
+    # previous — invented — rows stay. One pair in 3,522 did exactly that.
+    seen = set()
+    for rec in places:
+        pair = (rec.get("iso3"), rec.get("city"))
+        if pair in seen:
+            raise SystemExit(f"[bundle] places has two rows for {pair} — the service keys locations on "
+                             "this pair and would refuse the batch, leaving the old rows in place")
+        seen.add(pair)
     for rec in places:
         where = f"{rec.get('iso3')}/{rec.get('city')}"
         if rec["iso3"] not in iso3s:

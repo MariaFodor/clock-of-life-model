@@ -57,20 +57,39 @@ def test_refusals() -> None:
         check("country: a 1-country read is refused as partial", True)
 
     try:
-        A._validate_cities({f"X|c{i}": {"iso3": "XXX", "pm25": 12.0} for i in range(2500)}
-                           | {"BAD|c": {"iso3": "XX", "pm25": 12.0}})
+        A._validate_cities({f"X|c{i}": {"iso3": "XXX", "city": f"c{i}", "pm25": 12.0}
+                            for i in range(2500)}
+                           | {"BAD|c": {"iso3": "XX", "city": "c", "pm25": 12.0}})
         check("city: a two-letter country code is refused", False)
     except ValueError:
         check("city: a two-letter country code is refused", True)
 
     try:
-        A._validate_cities({f"X|c{i}": {"iso3": "XXX", "pm25": 12.0} for i in range(10)})
+        A._validate_cities({f"X|c{i}": {"iso3": "XXX", "city": f"c{i}", "pm25": 12.0}
+                            for i in range(10)})
         check("city: a truncated read is refused as partial", False)
     except ValueError:
         check("city: a truncated read is refused as partial", True)
 
     # The bands are wider than a guess would have made them, so check they still have a floor and
     # ceiling at all — the first draft of this module used 1-200 and rejected three real settlements.
+    # The invariant the service's UNIQUE (name, country) rests on. WHO ships "Abu Dhabi /ARE" and
+    # "Abu Dhabi/ARE" — the same city with and without a space — and keying on the raw name let both
+    # through, which made Postgres refuse the whole batch and leave the invented rows in place.
+    try:
+        A._validate_cities({f"X|c{i}": {"iso3": "XXX", "city": "Same", "pm25": 12.0}
+                            for i in range(2500)})
+        check("duplicate (iso3, city) pairs are refused", False, "accepted 2500 rows named Same")
+    except ValueError:
+        check("duplicate (iso3, city) pairs are refused", True)
+
+    try:
+        A._validate_cities({f"X|c{i}": {"iso3": "XXX", "city": f"c{i}", "pm25": 12.0}
+                            for i in range(2500)} | {"X|": {"iso3": "XXX", "city": "", "pm25": 12.0}})
+        check("a name that is empty after stripping WHO's suffix is refused", False)
+    except ValueError:
+        check("a name that is empty after stripping WHO's suffix is refused", True)
+
     check("city band admits the measured extremes (0.92 Birkeland, 278.72 Mamak)",
           A.PM25_CITY_MIN <= 0.92 and A.PM25_CITY_MAX >= 278.72)
     check("city band is still bounded below 1000", A.PM25_CITY_MAX < 1000)
@@ -142,8 +161,8 @@ def test_city_layer() -> dict:
     print("\ncity layer (WHO AAQ v8.0)")
     cities = A.fetch_city_pm25()
     source = cities.pop("_source")
-    check("3,522 settlements in 85 countries inside 2020-2025",
-          len(cities) == 3522 and source["countries"] == 85,
+    check("3,521 settlements in 85 countries inside 2020-2025",
+          len(cities) == 3521 and source["countries"] == 85,
           f"{len(cities)} in {source['countries']}")
     check("no reading predates the window",
           all(A.MIN_YEAR <= v["year"] <= A.MAX_YEAR for v in cities.values()))

@@ -41,7 +41,7 @@ TIMEOUT = 180
 #: Bumped whenever the filter, the column set or the cached payload's shape changes, so a stale extract
 #: built under different rules cannot be served as if it were this one. `fetch/wpp.py` documents the bug
 #: that earned this convention: adding a field without bumping produced a cache hit missing that field.
-CACHE_SCHEMA = 2
+CACHE_SCHEMA = 3
 
 CACHE = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "cache")
 
@@ -114,7 +114,7 @@ ISO3_ALIASES = {"KSV": "XKX"}
 #: whose most recent PM2.5 reading predates it is not shown as a current measurement.
 #:
 #: This costs real coverage and the number is worth stating rather than discovering later: all-time the
-#: database holds 5,311 settlements in 116 countries; inside the window it holds 3,522 in 85. Romania
+#: database holds 5,311 settlements in 116 countries; inside the window it holds 3,521 in 85. Romania
 #: goes from 61 to 60. The alternative — showing a 2013 reading on a surface that says "air quality
 #: here" — is worse, because a decade of policy sits between that number and the reader. What the map
 #: must therefore say of an unmeasured country is "no measurement since 2020", not "never measured":
@@ -341,15 +341,19 @@ def fetch_city_pm25(refresh: bool = False) -> dict:
             # A settlement with no usable coordinates cannot be drawn, cannot be joined to greenness
             # and cannot be checked against the country it claims. It is not a place here.
             continue
-        iso3, city = r[idx["iso3"]], r[idx["city"]]
-        iso3 = ISO3_ALIASES.get(iso3, iso3)
+        iso3 = ISO3_ALIASES.get(r[idx["iso3"]], r[idx["iso3"]])
+        # Strip WHO's own "/ISO3" suffix BEFORE keying, not after. Keying on the raw name and storing
+        # the stripped one let "Abu Dhabi /ARE" and "Abu Dhabi/ARE" — the same city, spelled with and
+        # without a space — both survive as separate settlements with the same stored name, which the
+        # service's `UNIQUE (name, country)` then refused with "ON CONFLICT DO UPDATE command cannot
+        # affect row a second time". One pair in 3,522, and it broke every integration test.
+        city = re.sub(r"\s*/\s*[A-Z]{3}\s*$", "", r[idx["city"]]).strip()
         key = f"{iso3}|{city}"
         if key in best and best[key]["year"] >= year:
             continue
         best[key] = {
             "iso3": iso3,
-            # WHO suffixes some names with their own code ("Kabul/AFG"); nothing downstream wants that.
-            "city": re.sub(r"\s*/\s*[A-Z]{3}\s*$", "", city),
+            "city": city,
             "pm25": round(value, 2),
             "year": year,
             "stations": _int(r[idx["number_stations"]]) if "number_stations" in idx else None,
@@ -387,3 +391,13 @@ def _validate_cities(best: dict) -> None:
                              f"[{PM25_CITY_MIN}, {PM25_CITY_MAX}]")
         if len(rec["iso3"]) != 3:
             raise ValueError(f"AAQ {key}: iso3 {rec['iso3']!r} is not a three-letter code")
+        if not rec["city"]:
+            raise ValueError(f"AAQ {key}: the city name is empty after stripping WHO's suffix")
+    # The invariant the service's UNIQUE (name, country) depends on, asserted where it is created
+    # rather than discovered at seed time.
+    pairs = [(r["iso3"], r["city"]) for r in best.values()]
+    if len(set(pairs)) != len(pairs):
+        from collections import Counter
+        dupes = [k for k, n in Counter(pairs).items() if n > 1]
+        raise ValueError(f"AAQ: {len(dupes)} duplicate (iso3, city) pair(s) {dupes[:3]} — the service "
+                         "keys locations on exactly this pair and would refuse the batch")
