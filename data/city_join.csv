@@ -1,0 +1,1039 @@
+greenspace_city,greenspace_country,who_iso3,who_city,method,distance_km
+Aba,Nigeria,NGA,,rejected_too_far,412.9
+Abbottabad,Pakistan,PAK,,rejected_too_far,46.9
+Abeokuta,Nigeria,NGA,,rejected_too_far,72.3
+Abidjan,Cote d'Ivoire,CIV,,rejected_country_unmeasured,
+Abu Dhabi,United Arab Emirates,ARE,,rejected_too_far,27.0
+Abuja,Nigeria,NGA,,rejected_too_far,155.9
+Acapulco,Mexico,MEX,,rejected_too_far,214.9
+Accra,Ghana,GHA,,rejected_country_unmeasured,
+Ad Da'ein,Sudan,,,rejected_no_geocode,
+Ad Diwaniyah,Iraq,IRQ,,rejected_too_far,70.1
+Adana,Turkey,TUR,Adana/TUR,gazetteer_25km,0.4
+Addis Ababa,Ethiopia,ETH,Addis Ababa/ETH,gazetteer_25km,4.1
+Adelaide,Australia,AUS,Adelaide/AUS,gazetteer_25km,6.2
+Agadir,Morocco,MAR,Agadir/MAR,gazetteer_25km,6.0
+Agartala,India,IND,Agartala/IND,gazetteer_25km,0.4
+Agra,India,IND,Agra/IND,gazetteer_25km,6.1
+Aguascalientes,Mexico,MEX,Aguascalientes Aguascalientes/MEX,gazetteer_25km,0.7
+Ahmadnagar,India,IND,,rejected_too_far,75.1
+Ahmedabad,India,IND,Ahmedabad/IND,gazetteer_25km,1.1
+Ahwaz,Islamic Republic of Iran,IRN,Ahvaz/IRN,gazetteer_25km,1.3
+Ajmer,India,IND,Ajmer/IND,gazetteer_25km,2.3
+Akola,India,IND,,rejected_too_far,214.2
+Akure,Nigeria,NGA,,rejected_too_far,79.3
+Al Ain,United Arab Emirates,ARE,,rejected_too_far,85.0
+Al Ismailiya,Egypt,EGY,,rejected_too_far,102.7
+Al Managil,Sudan,,,rejected_no_geocode,
+Al-Fashir,Sudan,SDN,,rejected_country_unmeasured,
+Al-Minya,Egypt,EGY,,rejected_too_far,219.8
+Al-Ubayyid,Sudan,SDN,,rejected_country_unmeasured,
+Al-Zaqaziq,Egypt,,,rejected_no_geocode,
+Alappuzha,India,IND,,rejected_too_far,57.6
+Albuquerque,United States of America,USA,Albuquerque NM/USA,gazetteer_25km,3.6
+Aleppo,Syrian Arab Republic,SYR,,rejected_country_unmeasured,
+Alexandria,Egypt,EGY,,rejected_too_far,206.3
+Algiers,Algeria,DZA,Algiers/DZA,gazetteer_25km,5.0
+Aligarh,India,IND,,rejected_too_far,62.5
+Almaty,Kazakhstan,KAZ,Almaty/KAZ,gazetteer_25km,0.6
+Alwar,India,IND,,rejected_too_far,27.5
+Amaigbo,Nigeria,NGA,,rejected_too_far,413.3
+Amarah,Iraq,IRQ,,rejected_too_far,266.2
+Ambala,India,IND,,rejected_too_far,33.9
+Amman,Jordan,JOR,Amman/JOR,gazetteer_25km,2.4
+Amravati,India,IND,,rejected_too_far,150.5
+Amritsar,India,IND,,rejected_too_far,38.8
+Amsterdam,Netherlands,NLD,Greater Amsterdam/NLD,gazetteer_25km,0.3
+An Nazlah,Egypt,,,rejected_no_geocode,
+Anand,India,IND,,rejected_too_far,34.3
+Angeles [San Fernando],Philippines,,,rejected_no_geocode,
+Ankara,Turkey,TUR,Ankara/TUR,gazetteer_25km,0.9
+Anqing,China,CHN,Yingjiang Qu/CHN,gazetteer_25km,0.8
+Anshan,China,CHN,Anshan/CHN,gazetteer_25km,2.6
+Antalya,Turkey,TUR,Kepez/TUR,gazetteer_25km,0.9
+Antananarivo,Madagascar,MDG,Antananarivo/MDG,gazetteer_25km,0.7
+Antwerp,Belgium,BEL,Antwerpen/BEL,gazetteer_25km,1.7
+Anyang,China,CHN,Wenfeng Qu/CHN,gazetteer_25km,1.2
+Aracaju,Brazil,BRA,,rejected_too_far,234.5
+Ardabil,Islamic Republic of Iran,IRN,,rejected_too_far,157.8
+Arequipa,Peru,PER,,rejected_too_far,750.4
+Arusha,United Republic of Tanzania,TZA,,rejected_too_far,399.2
+Asansol,India,IND,,rejected_too_far,53.5
+Ashgabat,Turkmenistan,TKM,Ashgabat/TKM,gazetteer_25km,1.0
+Asmara,Eritrea,ERI,,rejected_country_unmeasured,
+Astrakhan,Russian Federation,RUS,,rejected_too_far,1269.6
+Asuncion,Argentina,PRY,Asuncion/PRY,gazetteer_25km,2.7
+Asyut,Egypt,EGY,,rejected_too_far,310.1
+At Taif,Saudi Arabia,SAU,Mecca Province/SAU,gazetteer_25km,13.4
+At Tarimiyah,Iraq,,,rejected_no_geocode,
+Athens,Greece,GRC,Athina/GRC,gazetteer_25km,4.1
+Atlanta,United States of America,USA,Atlanta Sandy Springs Roswell GA/USA,gazetteer_25km,2.1
+Auckland,New Zealand,NZL,Auckland CBD/NZL,gazetteer_25km,0.6
+Aurangabad,India,IND,,rejected_too_far,146.6
+Austin,United States of America,USA,Austin Round Rock TX/USA,gazetteer_25km,11.8
+Azamgarh,India,IND,,rejected_too_far,74.2
+Bacolod,Philippines,PHL,,rejected_too_far,37.7
+Baghdad,Iraq,IRQ,Baghdad/IRQ,gazetteer_25km,6.8
+Bahraich,India,IND,,rejected_too_far,72.8
+Bakersfield,United States of America,USA,Bakersfield CA/USA,gazetteer_25km,1.7
+Baku,Azerbaijan,AZE,,rejected_country_unmeasured,
+Balikpapan,Indonesia,IDN,,rejected_too_far,665.6
+Ballari,India,IND,,rejected_too_far,88.8
+Ballia,India,IND,,rejected_too_far,119.5
+Balrampur,India,IND,,rejected_too_far,114.7
+Balti,Moldova,MDA,,rejected_country_unmeasured,
+Baltimore,United States of America,USA,Baltimore Columbia Towson MD/USA,gazetteer_25km,3.2
+Bamako,Mali,MLI,,rejected_country_unmeasured,
+Banda,India,IND,,rejected_too_far,118.5
+Bandar Lampung,Indonesia,IDN,,rejected_too_far,185.1
+Bandar Seri Begawan,Brunei,BRN,,rejected_country_unmeasured,
+Bandung,Indonesia,IDN,Bandung/IDN,gazetteer_25km,0.9
+Bangkok,Thailand,THA,Bangkok/THA,gazetteer_25km,5.4
+Bangui,Central African Republic,CAF,,rejected_country_unmeasured,
+Banha,Egypt,EGY,,rejected_too_far,64.3
+Banjarmasin,Indonesia,IDN,,rejected_too_far,329.6
+Baoding,China,CHN,Jingxiu District/CHN,gazetteer_25km,1.8
+Baoji,China,CHN,Baoji/CHN,gazetteer_25km,4.7
+Baotou,China,CHN,Kundulun Qu/CHN,gazetteer_25km,2.3
+Barcelona [Spain],Bolivarian Republic of Venezuela,,,rejected_no_geocode,
+Barcelona [Venezuela],Spain,,,rejected_no_geocode,
+Bareilly,India,IND,Bareilly/IND,gazetteer_25km,2.4
+Barnaul,Russian Federation,RUS,,rejected_too_far,2929.3
+Barquisimeto,Bolivarian Republic of Venezuela,VEN,,rejected_too_far,515.5
+Barranquilla,Colombia,COL,Barranquilla/COL,gazetteer_25km,4.5
+Basra,Iraq,IRQ,,rejected_too_far,385.5
+Basti,India,IND,,rejected_too_far,141.9
+Bata,Equatorial Guinea,GNQ,,rejected_country_unmeasured,
+Batam City,Indonesia,,,rejected_no_geocode,
+Bauchi,Nigeria,NGA,,rejected_too_far,265.3
+Begusarai,India,IND,,rejected_too_far,101.9
+Beihai,China,CHN,Haicheng Qu/CHN,gazetteer_25km,2.6
+Beijing,China,CHN,Dongcheng Qu/CHN,gazetteer_25km,4.8
+Beirut,Lebanon,LBN,Beirut/LBN,gazetteer_25km,3.0
+Belagavi,India,IND,Mapusa/IND,gazetteer_25km,12.7
+Belgrade,Serbia,SRB,Belgrade/SRB,gazetteer_25km,1.3
+Belize City,Belize,BLZ,,rejected_country_unmeasured,
+Belo Horizonte,Brazil,BRA,Belo Horizonte/BRA,gazetteer_25km,2.4
+Belém,Brazil,BRA,,rejected_too_far,402.8
+Bender,Moldova,MDA,,rejected_country_unmeasured,
+Bengaluru,India,IND,Bengaluru/IND,gazetteer_25km,0.1
+Bengbu,China,CHN,Bengbu/CHN,gazetteer_25km,1.4
+Beni,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Benin City,Nigeria,NGA,,rejected_too_far,178.7
+Benxi,China,CHN,Pingshan Qu/CHN,gazetteer_25km,0.3
+Berhampore,India,IND,,rejected_too_far,28.7
+Berlin,Germany,DEU,Berlin/DEU,gazetteer_25km,2.7
+Bhadohi,India,IND,,rejected_too_far,45.9
+Bhavnagar,India,IND,,rejected_too_far,90.3
+Bhind,India,IND,,rejected_too_far,61.8
+Bhinga,India,IND,,rejected_too_far,107.2
+Bhopal,India,IND,Mandideep/IND,gazetteer_25km,19.5
+Bhubaneshwar,India,IND,,rejected_too_far,43.8
+Bihar Sharif,India,IND,,rejected_too_far,61.5
+Bikaner,India,IND,,rejected_too_far,184.6
+Bilaspur,India,IND,Bilashpur/IND,gazetteer_25km,11.3
+Bilbao,Spain,ESP,Sondika/ESP,gazetteer_25km,4.0
+Binhai,China,CHN,,rejected_too_far,74.8
+Birmingham,United Kingdom,GBR,Birmingham/GBR,gazetteer_25km,2.5
+Bishkek,Kyrgyzstan,KGZ,Bishkek/KGZ,gazetteer_25km,5.4
+Bissau,Guinea-Bissau,GNB,,rejected_country_unmeasured,
+Bitola,Macedonia,MKD,Bitola/MKD,gazetteer_25km,0.2
+Blida,Algeria,DZA,,rejected_too_far,37.0
+Bobo-Dioulasso,Burkina Faso,BFA,,rejected_country_unmeasured,
+Bogota,Colombia,COL,Bogota/COL,gazetteer_25km,5.2
+Bogura,Bangladesh,BGD,,rejected_too_far,93.9
+Bokaro,India,IND,,rejected_too_far,61.8
+Bordeaux,France,FRA,Bordeaux/FRA,gazetteer_25km,0.4
+Boston,United States of America,USA,Boston Cambridge Newton MA NH/USA,gazetteer_25km,9.6
+Bouaké,Cote d'Ivoire,CIV,,rejected_country_unmeasured,
+Bradenton,United States of America,USA,North Port Sarasota Bradenton FL/USA,gazetteer_25km,21.4
+Brahmanbaria,Bangladesh,BGD,,rejected_too_far,70.4
+Brahmapur,India,IND,,rejected_too_far,28.7
+Bratislava,Slovakia,SVK,Bratislava/SVK,gazetteer_25km,2.1
+Brazzaville,Democratic Republic of the Congo,COG,,rejected_country_unmeasured,
+Bridgeport,United States of America,USA,Bridgeport Stamford Norwalk CT/USA,gazetteer_25km,12.6
+Bridgetown,Barbados,USA,Portland Vancouver Hillsboro OR WA/USA,gazetteer_25km,9.5
+Brisbane,Australia,AUS,Brisbane/AUS,gazetteer_25km,4.7
+Bristol,United Kingdom,GBR,Bristol/GBR,gazetteer_25km,1.0
+Brussels,Belgium,BEL,Bruxelles Brussel/BEL,gazetteer_25km,0.5
+Bucaramanga,Colombia,COL,Bucaramanga/COL,gazetteer_25km,0.5
+Bucharest,Romania,ROU,Bucuresti/ROU,gazetteer_25km,1.0
+Budapest,Hungary,HUN,Budapest/HUN,gazetteer_25km,3.2
+Budaun,India,IND,,rejected_too_far,44.8
+Buenos Aires,Argentina,ARG,Buenos Aires/ARG,gazetteer_25km,3.5
+Buffalo,United States of America,USA,Buffalo Cheektowaga Niagara Falls NY/USA,gazetteer_25km,9.2
+Bujumbura,Burundi,BDI,,rejected_country_unmeasured,
+Bukavu,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Bukit Mertajam,Malaysia,MYS,Pulau Pinang/MYS,gazetteer_25km,13.7
+Bulandshahr,India,IND,Bulandshahr/IND,gazetteer_25km,0.8
+Bulawayo,Zimbabwe,ZWE,,rejected_country_unmeasured,
+Bunia,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Buram,Sudan,SDN,,rejected_country_unmeasured,
+Bursa,Turkey,TUR,Osmangazi/TUR,gazetteer_25km,2.7
+Busan,Republic of Korea,KOR,Busan/KOR,gazetteer_25km,6.7
+Cabinda,Angola,AGO,,rejected_country_unmeasured,
+Cagayan de Oro,Philippines,PHL,Cagayan De Oro/PHL,gazetteer_25km,2.1
+Cairo,Egypt,EGY,,rejected_too_far,27.9
+Calabar,Nigeria,NGA,,rejected_too_far,507.4
+Calgary,Canada,CAN,Calgary/CAN,gazetteer_25km,4.4
+Cali,Colombia,COL,Cali/COL,gazetteer_25km,0.9
+Campinas,Brazil,BRA,Campinas/BRA,gazetteer_25km,1.8
+Campo Grande,Brazil,BRA,,rejected_too_far,547.5
+Can Tho,Vietnam,VNM,Can Tho/VNM,gazetteer_25km,0.7
+Cancún,Mexico,CHN,Changchun/CHN,gazetteer_25km,3.1
+Cangzhou,China,CHN,Cangzhou/CHN,gazetteer_25km,0.3
+Cape Town,South Africa,ZAF,Cape Town/ZAF,gazetteer_25km,12.7
+Caracas,Bolivarian Republic of Venezuela,VEN,,rejected_too_far,247.0
+Cartagena,Colombia,COL,Cartagena De Indias/COL,gazetteer_25km,0.4
+Casablanca,Morocco,MAR,Casablanca/MAR,gazetteer_25km,5.0
+Cebu City,Philippines,PHL,Talisay Cebu /PHL,gazetteer_25km,3.3
+Ceilândia,Brazil,BRA,,rejected_too_far,205.0
+Chandigarh,India,IND,Panchkula/IND,gazetteer_25km,7.7
+Chang bangdu,Bhutan,,,rejected_no_geocode,
+Changchun,China,CHN,Changchun/CHN,gazetteer_25km,3.1
+Changde,China,CHN,Wuling Qu/CHN,gazetteer_25km,1.8
+Changsha,China,CHN,Changsha/CHN,gazetteer_25km,1.3
+Changshu,China,CHN,Changshu Shi/CHN,gazetteer_25km,2.2
+Changwon,Republic of Korea,KOR,,rejected_too_far,33.9
+Changzhi,China,CHN,Huafeng North Road/CHN,gazetteer_25km,1.3
+Changzhou,China,CHN,Changzhou/CHN,gazetteer_25km,5.0
+Chapainawabganj,Bangladesh,,,rejected_no_geocode,
+Chattogram,Bangladesh,BGD,Chittagong/BGD,gazetteer_25km,5.4
+Chelyabinsk,Russian Federation,RUS,,rejected_too_far,1494.7
+Chengdu,China,CHN,Qingyang Qu/CHN,gazetteer_25km,2.9
+Chennai,India,IND,Chennai/IND,gazetteer_25km,4.3
+Cheongju-si,Republic of Korea,KOR,Chungcheongbuk Do/KOR,gazetteer_25km,17.0
+Chhapra,India,IND,,rejected_too_far,43.2
+Chicago,United States of America,USA,Chicago Naperville Elgin IL IN WI/USA,gazetteer_25km,5.6
+Chiclayo,Peru,PER,,rejected_too_far,649.4
+Chifeng,China,CHN,Hongshan District Chifeng/CHN,gazetteer_25km,0.7
+Chihuahua,Mexico,MEX,,rejected_too_far,42.0
+Chisinau,Moldova,MDA,,rejected_country_unmeasured,
+Chongjin,Democratic People's Republic of Korea,PRK,,rejected_country_unmeasured,
+Chongqing,China,CHN,Da Xi Gou/CHN,gazetteer_25km,1.2
+Cilacap,Indonesia,IDN,,rejected_too_far,178.8
+Cilegon,Indonesia,IDN,,rejected_too_far,76.8
+Cincinnati,United States of America,USA,Cincinnati OH KY IN/USA,gazetteer_25km,18.1
+Cirebon,Indonesia,IDN,,rejected_too_far,107.1
+Ciudad Guayana,Bolivarian Republic of Venezuela,VEN,,rejected_too_far,297.2
+Ciudad Juárez,Mexico,MEX,Juarez Chihuahua/MEX,gazetteer_25km,3.7
+Ciudad del Este,Paraguay,PRY,,rejected_too_far,288.2
+Cixi,China,CHN,,rejected_too_far,45.1
+Cleveland,United States of America,USA,Cleveland Elyria OH/USA,gazetteer_25km,7.2
+Cochabamba,Bolivia,BOL,,rejected_country_unmeasured,
+Coimbatore,India,IND,,rejected_too_far,43.0
+Cologne,Germany,DEU,Koln/DEU,gazetteer_25km,0.7
+Colombo,Sri Lanka,LKA,Colombo/LKA,gazetteer_25km,2.5
+Columbus,United States of America,USA,Columbus OH/USA,gazetteer_25km,7.5
+Comilla,Bangladesh,BGD,,rejected_too_far,72.1
+Conakry,Guinea,GIN,,rejected_country_unmeasured,
+Concepción,Chile,CHL,Concepcion/CHL,gazetteer_25km,4.7
+Concord,United States of America,USA,San Francisco Oakland Hayward CA/USA,gazetteer_25km,20.5
+Constantine,Algeria,DZA,,rejected_too_far,322.3
+Copenhagen,Denmark,DNK,Copenhagen/DNK,gazetteer_25km,1.8
+Cordoba,Argentina,ARG,,rejected_too_far,641.9
+Cotonou,Benin,BEN,Cotonou/BEN,gazetteer_25km,1.4
+Cuernavaca,Mexico,MEX,Cuernavaca Morelos/MEX,gazetteer_25km,0.6
+Cuiabá,Brazil,BRA,,rejected_too_far,912.7
+Culiacán,Mexico,MEX,,rejected_too_far,290.6
+Curitiba,Brazil,BRA,,rejected_too_far,324.5
+Cuttack,India,IND,,rejected_too_far,28.4
+Cúcuta,Colombia,COL,Cucuta/COL,gazetteer_25km,0.5
+Da Nang,Vietnam,VNM,,rejected_too_far,79.7
+Daegu,Republic of Korea,KOR,Daegu/KOR,gazetteer_25km,2.7
+Daejeon,Republic of Korea,KOR,Daejeon/KOR,gazetteer_25km,0.7
+Daganbhuiyan,Bangladesh,,,rejected_no_geocode,
+Dagupan,Philippines,PHL,Dagupan Pangasinan/PHL,gazetteer_25km,0.2
+Dakar,Senegal,SEN,Dakar/SEN,gazetteer_25km,1.2
+Dalian,China,CHN,Xigang District Dalian/CHN,gazetteer_25km,2.7
+Dallas,United States of America,USA,Dallas Fort Worth Arlington TX/USA,gazetteer_25km,14.6
+Damascus,Syrian Arab Republic,SYR,,rejected_country_unmeasured,
+Damietta,Egypt,EGY,,rejected_too_far,165.0
+Dammam,Saudi Arabia,SAU,,rejected_too_far,81.1
+Dandong,Democratic People's Republic of Korea,CHN,Yuanbao Qu/CHN,gazetteer_25km,1.9
+Dar es Salaam,United Republic of Tanzania,TZA,,rejected_too_far,177.6
+Darbhanga,India,IND,,rejected_too_far,50.8
+Darjeeling,India,IND,,rejected_too_far,44.5
+Datong,China,CHN,Datong/CHN,gazetteer_25km,1.4
+Davanagere,India,,,rejected_no_geocode,
+Davao City,Philippines,PHL,Davao/PHL,gazetteer_25km,6.3
+Dazhou,China,CHN,Tongchuan Qu/CHN,gazetteer_25km,3.9
+Deesa,India,IND,,rejected_too_far,142.7
+Dehradun,India,IND,Dehradun/IND,gazetteer_25km,9.1
+Delhi [New Delhi],India,,,rejected_no_geocode,
+Denizli,Turkey,TUR,,rejected_too_far,89.1
+Denpasar,Indonesia,IDN,Bali/IDN,gazetteer_25km,1.7
+Denver,United States of America,USA,Denver Aurora Lakewood CO/USA,gazetteer_25km,3.7
+Deoria,India,IND,,rejected_too_far,135.4
+Detroit,United States of America,USA,Detroit Warren Dearborn MI/USA,gazetteer_25km,6.1
+Dezhou,China,CHN,Dezhou/CHN,gazetteer_25km,2.8
+Dhaka,Bangladesh,BGD,Dhaka/BGD,gazetteer_25km,9.7
+Dhanbad,India,IND,,rejected_too_far,92.1
+Dharwad,India,,,rejected_no_geocode,
+Dhule,India,IND,,rejected_too_far,105.5
+Dili,Timor-Leste,IND,Delhi/IND,gazetteer_25km,6.5
+Dimapur,India,IND,,rejected_too_far,42.4
+Dindigul,India,IND,,rejected_too_far,25.7
+Diyarbakir,Turkey,TUR,,rejected_too_far,213.0
+Djibouti,Djibouti,DJI,,rejected_country_unmeasured,
+Dnipro,Ukraine,UKR,,rejected_too_far,394.3
+Doha,Qatar,QAT,Doha/QAT,gazetteer_25km,7.1
+Donetsk,Ukraine,UKR,,rejected_too_far,593.5
+Dongying Qu,China,,,rejected_no_geocode,
+Dortmund,Germany,DEU,Dortmund/DEU,gazetteer_25km,0.6
+Douala,Cameroon,CMR,,rejected_too_far,176.4
+Drachevo,Macedonia,,,rejected_no_geocode,
+Dresden,Germany,DEU,Dresden/DEU,gazetteer_25km,1.0
+Dubai,United Arab Emirates,ARE,Dubai/ARE,gazetteer_25km,7.9
+Dublin,Ireland,IRL,Fairview/IRL,gazetteer_25km,2.2
+Duhok,Iraq,IRQ,,rejected_too_far,419.1
+Durango,Mexico,MEX,Durango Durango/MEX,gazetteer_25km,2.1
+Durban,South Africa,ZAF,Ethekwini/ZAF,gazetteer_25km,17.6
+Durg,India,IND,,rejected_too_far,62.4
+Dushanbe,Tajikistan,TJK,Dushanbe/TJK,gazetteer_25km,7.6
+Dusseldorf,Germany,DEU,Dusseldorf/DEU,gazetteer_25km,0.5
+Edmonton,Canada,CAN,Edmonton/CAN,gazetteer_25km,4.0
+El Alto [La Paz],Bolivia,,,rejected_no_geocode,
+El Mahalla El Kubra,Egypt,EGY,,rejected_too_far,117.7
+Enugu,Nigeria,NGA,,rejected_too_far,349.3
+Erbil,Iraq,IRQ,,rejected_too_far,325.7
+Erode,India,IND,,rejected_too_far,63.2
+Eskisehir,Turkey,TUR,Eskisehir/TUR,gazetteer_25km,1.9
+Etah,India,IND,,rejected_too_far,69.9
+Etawah,India,IND,,rejected_too_far,93.9
+Ettumanoor,India,IND,,rejected_too_far,38.3
+Evaton,South Africa,ZAF,Sebokeng/ZAF,gazetteer_25km,6.1
+Faisalabad,Pakistan,PAK,Faisalabad/PAK,gazetteer_25km,1.0
+Faiyum,Egypt,,,rejected_no_geocode,
+Faizabad,India,IND,,rejected_too_far,111.6
+Fancheng,China,CHN,Fancheng Qu/CHN,gazetteer_25km,1.7
+Farrukhabad,India,IND,,rejected_too_far,107.8
+Fatehpur,India,IND,,rejected_too_far,88.9
+Feira de Santana,Brazil,BRA,,rejected_too_far,80.4
+Fez,Morocco,MAR,Fes/MAR,gazetteer_25km,1.5
+Firozabad,India,IND,,rejected_too_far,34.6
+Florianópolis,Brazil,BRA,,rejected_too_far,106.7
+Fomboni,Comoros,COM,,rejected_country_unmeasured,
+Fortaleza,Brazil,BRA,,rejected_too_far,650.2
+Frankfurt am Main,Germany,DEU,Frankfurt Am Main/DEU,gazetteer_25km,0.7
+Freetown,Sierra Leone,SLE,,rejected_country_unmeasured,
+Fresno,United States of America,USA,Fresno CA/USA,gazetteer_25km,4.5
+Fukuoka,Japan,JPN,Fukuoka/JPN,gazetteer_25km,3.7
+Fushun,China,CHN,Shuncheng Qu/CHN,gazetteer_25km,2.3
+Fuxin,China,CHN,Xihe Qu/CHN,gazetteer_25km,0.7
+Fuyang,China,CHN,Fuyang/CHN,gazetteer_25km,1.7
+Fuzhou,China,CHN,Cangshan Qu/CHN,gazetteer_25km,2.5
+Gaborone,Botswana,BWA,,rejected_country_unmeasured,
+Ganzhou,China,CHN,Zhanggong Qu/CHN,gazetteer_25km,1.1
+Garoua,Cameroon,CMR,,rejected_too_far,516.8
+Garut,Indonesia,IDN,,rejected_too_far,50.3
+Gaya,India,IND,Gaya/IND,gazetteer_25km,3.3
+Gaza,Egypt,PSE,,rejected_country_unmeasured,
+Gaziantep,Turkey,TUR,Gaziantep/TUR,gazetteer_25km,2.0
+Gdansk,Poland,POL,Gdansk/POL,gazetteer_25km,4.7
+Genoa,Italy,ITA,Genova/ITA,gazetteer_25km,2.7
+George Town,Malaysia,MYS,Pulau Pinang/MYS,gazetteer_25km,6.3
+Georgetown,Guyana,GUY,,rejected_country_unmeasured,
+Ghazipur,India,IND,,rejected_too_far,43.7
+Girga,Egypt,EGY,,rejected_too_far,269.5
+Giridih,India,IND,,rejected_too_far,100.0
+Glasgow,United Kingdom,GBR,Glasgow/GBR,gazetteer_25km,0.3
+Goiânia,Brazil,BRA,,rejected_too_far,260.5
+Goma,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Gonda,India,IND,,rejected_too_far,85.9
+Gorakhpur,India,IND,,rejected_too_far,152.7
+Gostivar,Macedonia,MKD,Gostivar/MKD,gazetteer_25km,0.4
+Guadalajara,Mexico,MEX,Tlaquepaque Jalisco/MEX,gazetteer_25km,5.4
+Guangzhou,China,CHN,Jiang Nan Da Dao/CHN,gazetteer_25km,1.7
+Guatemala City,Guatemala,GTM,Guatemala/GTM,gazetteer_25km,3.7
+Guayaquil,Ecuador,ECU,,rejected_too_far,126.1
+Guilin,China,CHN,Qixing District/CHN,gazetteer_25km,1.6
+Guiyang,China,CHN,Yunyan Qu/CHN,gazetteer_25km,2.8
+Gujranwala,Pakistan,PAK,,rejected_too_far,67.7
+Gujrat,Pakistan,PAK,,rejected_too_far,115.4
+Guntur,India,IND,Guntur/IND,gazetteer_25km,23.7
+Guruvayur,India,IND,,rejected_too_far,47.3
+Guwahati,India,IND,Gauhati/IND,gazetteer_25km,8.9
+Gwalior,India,IND,Gwalior/IND,gazetteer_25km,10.3
+Gwangju,Republic of Korea,KOR,Gwangju/KOR,gazetteer_25km,4.9
+Haikou,China,CHN,Longhua Qu/CHN,gazetteer_25km,2.4
+Haiphong,Vietnam,VNM,Hai Phong/VNM,gazetteer_25km,0.0
+Hamamatsu,Japan,JPN,Hamamatsu/JPN,gazetteer_25km,1.4
+Hamburg,Germany,DEU,Hamburg/DEU,gazetteer_25km,1.4
+Hamedan,Islamic Republic of Iran,IRN,Hamadan/IRN,gazetteer_25km,0.1
+Hamhung,Democratic People's Republic of Korea,PRK,,rejected_country_unmeasured,
+Handan,China,CHN,Handan/CHN,gazetteer_25km,2.0
+Handia,India,IND,,rejected_too_far,27.1
+Hangzhou,China,CHN,Xiacheng Qu/CHN,gazetteer_25km,0.6
+Hanoi,Vietnam,VNM,Hanoi/VNM,gazetteer_25km,1.2
+Hanover,Germany,DEU,Hannover/DEU,gazetteer_25km,1.3
+Harare,Zimbabwe,ZWE,,rejected_country_unmeasured,
+Harbin,China,CHN,Harbin/CHN,gazetteer_25km,1.3
+Hardoi,India,IND,,rejected_too_far,87.7
+Hargeisa,Somalia,SOM,,rejected_country_unmeasured,
+Haridwar,India,IND,,rejected_too_far,26.8
+Havana,Cuba,CUB,La Habana/CUB,gazetteer_25km,1.3
+Hefei,China,CHN,Hefei/CHN,gazetteer_25km,2.2
+Hegang,China,CHN,Xiangyang District Hegang/CHN,gazetteer_25km,2.0
+Helsinki,Finland,FIN,Helsinki Helsingfors/FIN,gazetteer_25km,2.9
+Hengyang,China,CHN,Zhuhui Qu/CHN,gazetteer_25km,0.7
+Herat,Afghanistan,AFG,,rejected_too_far,641.3
+Hermosillo,Mexico,MEX,,rejected_too_far,245.1
+Hindiya,Iraq,IRQ,Babylon/IRQ,gazetteer_25km,20.3
+Hiroshima,Japan,JPN,Hiroshima/JPN,gazetteer_25km,2.8
+Ho Chi Minh City,Vietnam,VNM,Ho Chi Minh/VNM,gazetteer_25km,9.1
+Hodeidah,Yemen,,,rejected_no_geocode,
+Hofuf,Saudi Arabia,SAU,,rejected_too_far,117.8
+Hohhot,China,CHN,Hohhot/CHN,gazetteer_25km,1.5
+Homna,Bangladesh,,,rejected_no_geocode,
+Homs,Syrian Arab Republic,SYR,,rejected_country_unmeasured,
+Hong Kong,China,HKG,,rejected_country_unmeasured,
+Honiara,Solomon Islands,SLB,,rejected_country_unmeasured,
+Honolulu,United States of America,USA,Urban Honolulu HI/USA,gazetteer_25km,9.5
+Houston,United States of America,USA,Houston The Woodlands Sugar Land TX/USA,gazetteer_25km,6.0
+Hsinchu,China,TWN,,rejected_country_unmeasured,
+Huadu Qu,China,,,rejected_no_geocode,
+Huai'an,China,CHN,Qingjiangpu Qu/CHN,gazetteer_25km,0.3
+Huaibei,China,CHN,Huaibei Shi/CHN,gazetteer_25km,1.5
+Huambo,Angola,AGO,,rejected_country_unmeasured,
+Huangdao,China,,,rejected_no_geocode,
+Huangshi,China,CHN,Huangshigang Qu/CHN,gazetteer_25km,1.9
+Huiyang Qu,China,CHN,Huiyang Qu/CHN,gazetteer_25km,4.5
+Huizhou,China,CHN,Huicheng Qu/CHN,gazetteer_25km,3.3
+Huludao,China,CHN,Lianshan Qu/CHN,gazetteer_25km,1.7
+Ibadan,Nigeria,NGA,,rejected_too_far,70.1
+Ibagué,Colombia,COL,,rejected_too_far,68.8
+Ikorodu,Nigeria,NGA,Lagos/NGA,gazetteer_25km,17.9
+Ilorin,Nigeria,NGA,,rejected_too_far,108.9
+Imphal,India,IND,Imphal/IND,gazetteer_25km,1.1
+Indianapolis,United States of America,USA,Indianapolis Carmel Anderson IN/USA,gazetteer_25km,4.3
+Indore,India,IND,,rejected_too_far,36.1
+Ipoh,Malaysia,MYS,Perak/MYS,gazetteer_25km,22.5
+Irbid,Jordan,JOR,Irbid/JOR,gazetteer_25km,1.0
+Isfahan,Islamic Republic of Iran,IRN,Isfahan/IRN,gazetteer_25km,0.7
+Istanbul,Turkey,TUR,Istanbul/TUR,gazetteer_25km,0.4
+Itahari,Nepal,NPL,,rejected_too_far,225.1
+Izhevsk,Russian Federation,RUS,,rejected_too_far,966.4
+Izmir,Turkey,TUR,Izmir/TUR,gazetteer_25km,1.3
+Izmit,Turkey,TUR,Izmit/TUR,gazetteer_25km,1.3
+Jabalpur,India,IND,Jabalpur/IND,gazetteer_25km,21.9
+Jaipur,India,IND,,rejected_too_far,60.2
+Jakarta,Indonesia,IDN,Jakarta/IDN,gazetteer_25km,3.3
+Jalandhar,India,IND,Jalandhar/IND,gazetteer_25km,18.3
+Jalgaon,India,IND,,rejected_too_far,180.8
+Jalpaiguri,India,IND,,rejected_too_far,78.5
+Jambi,Indonesia,IDN,,rejected_too_far,198.8
+Jammu,India,IND,,rejected_too_far,32.1
+Jamnagar,India,IND,Jamnagar/IND,gazetteer_25km,0.7
+Jamshedpur,India,IND,,rejected_too_far,111.6
+Jaunpur,India,IND,,rejected_too_far,53.5
+Jaynagar Majilpur,India,IND,,rejected_too_far,30.1
+Jeddah,Saudi Arabia,SAU,,rejected_too_far,64.9
+Jember,Indonesia,IDN,,rejected_too_far,174.2
+Jeonju,Republic of Korea,KOR,Jeollabuk Do/KOR,gazetteer_25km,13.1
+Jerusalem,Occupied Palestinian territory,ISR,Allon Shevut/PSE,gazetteer_25km,15.6
+Jessore,Bangladesh,BGD,,rejected_too_far,49.2
+Jhansi,India,IND,,rejected_too_far,98.9
+Jiamusi,China,CHN,Jiamusi Shi/CHN,gazetteer_25km,1.8
+Jiangyin,China,CHN,Jiangyin Shi/CHN,gazetteer_25km,0.8
+Jiaozuo,China,CHN,Jiaozuo/CHN,gazetteer_25km,0.7
+Jiaxing,China,CHN,Nanhu Qu/CHN,gazetteer_25km,0.5
+Jieyang,China,CHN,Jieyang/CHN,gazetteer_25km,1.2
+Jilin,China,CHN,Changyi Qu/CHN,gazetteer_25km,1.8
+Jinan,China,CHN,Tianqiao Qu/CHN,gazetteer_25km,2.2
+Jingzhou,China,CHN,Jingzhou Qu/CHN,gazetteer_25km,1.6
+Jinhua,China,CHN,Wucheng Qu/CHN,gazetteer_25km,1.4
+Jining,China,CHN,Ji Ning/CHN,gazetteer_25km,1.1
+Jinzhou,China,CHN,Guta Qu/CHN,gazetteer_25km,2.6
+Jiujiang,China,CHN,Jiujiang Shi/CHN,gazetteer_25km,2.4
+Jodhpur,India,IND,,rejected_too_far,27.5
+Johannesburg,South Africa,ZAF,Bedfordview/ZAF,gazetteer_25km,9.6
+Jombang,Indonesia,IDN,,rejected_too_far,282.9
+Jos,Nigeria,NGA,,rejected_too_far,171.2
+João Pessoa,Brazil,BRA,,rejected_too_far,720.6
+João Teves,Cape Verde,,,rejected_no_geocode,
+Kabul,Afghanistan,AFG,Kabul/AFG,gazetteer_25km,1.9
+Kaduna,Nigeria,NGA,Kaduna/NGA,gazetteer_25km,7.8
+Kaifeng,China,CHN,Longting Qu/CHN,gazetteer_25km,1.0
+Kalaburagi,India,IND,,rejected_too_far,91.7
+Kampala,Uganda,UGA,Kampala/UGA,gazetteer_25km,2.1
+Kananga,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Kanazawa,Japan,JPN,,rejected_too_far,133.5
+Kandahar,Afghanistan,AFG,,rejected_too_far,459.0
+Kandy,Sri Lanka,LKA,,rejected_too_far,96.2
+Kannur,India,IND,Kannur/IND,gazetteer_25km,1.6
+Kano,Nigeria,NGA,,rejected_too_far,208.9
+Kanpur,India,IND,,rejected_too_far,25.0
+Kansas City,United States of America,USA,Kansas City MO KS/USA,gazetteer_25km,8.4
+Kaohsiung,China,TWN,,rejected_country_unmeasured,
+Kapoeta,South Sudan,,,rejected_no_geocode,
+Karachi,Pakistan,PAK,Karachi/PAK,gazetteer_25km,2.2
+Karbala,Iraq,IRQ,,rejected_too_far,40.7
+Kathmandu,Nepal,NPL,Kathmandu/NPL,gazetteer_25km,0.0
+Katihar,India,IND,,rejected_too_far,173.2
+Katowice,Poland,POL,Katowice/POL,gazetteer_25km,1.8
+Kayseri,Turkey,TUR,Kayseri/TUR,gazetteer_25km,1.2
+Kazan,Russian Federation,RUS,,rejected_too_far,718.0
+Kebkabiya,Sudan,SDN,,rejected_country_unmeasured,
+Kerman,Islamic Republic of Iran,IRN,Kerman/IRN,gazetteer_25km,0.4
+Kermanshah,Islamic Republic of Iran,IRN,Kermanshah/IRN,gazetteer_25km,1.9
+Kharagpur,India,IND,Kharagpur/IND,gazetteer_25km,1.6
+Kharkiv,Ukraine,UKR,,rejected_too_far,411.6
+Khartoum,Sudan,SDN,,rejected_country_unmeasured,
+Khulna,Bangladesh,BGD,Khulna/BGD,gazetteer_25km,4.7
+Kigali,Rwanda,RWA,,rejected_country_unmeasured,
+Kingston,Jamaica,JAM,Kingston/JAM,gazetteer_25km,2.9
+Kinshasa,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Kirkuk,Iraq,IRQ,,rejected_too_far,243.3
+Kisangani,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Kishoreganj,Bangladesh,BGD,,rejected_too_far,61.2
+Kitakyushu,Japan,JPN,Kitakyushu/JPN,gazetteer_25km,14.2
+Kitwe,Zambia,ZMB,,rejected_country_unmeasured,
+Klipgat,South Africa,,,rejected_no_geocode,
+Kochi,India,IND,Kochi/IND,gazetteer_25km,21.5
+Kolhapur,India,IND,,rejected_too_far,71.2
+Kolkata,India,IND,Howrah/IND,gazetteer_25km,22.3
+Kollam,India,IND,,rejected_too_far,52.0
+Konya,Turkey,TUR,Karatay/TUR,gazetteer_25km,3.1
+Kota,India,IND,,rejected_too_far,36.1
+Kota Kinabalu,Malaysia,MYS,Kota Kinabalu/MYS,gazetteer_25km,4.8
+Kozhikode,India,IND,,rejected_too_far,37.2
+Krakow,Poland,POL,Krakow/POL,gazetteer_25km,3.5
+Krasnodar,Russian Federation,RUS,,rejected_too_far,1192.7
+Krasnoyarsk,Russian Federation,RUS,,rejected_too_far,3355.0
+Krishnanagar,India,IND,,rejected_too_far,31.0
+Kryvyi Rih,Ukraine,UKR,,rejected_too_far,351.6
+Kuala Lumpur,Malaysia,MYS,Kuala Lumpur/MYS,gazetteer_25km,2.5
+Kuchai Kot,India,,,rejected_no_geocode,
+Kumamoto,Japan,JPN,,rejected_too_far,33.9
+Kumanovo,Macedonia,MKD,Kumanovo/MKD,gazetteer_25km,0.3
+Kumasi,Ghana,GHA,,rejected_country_unmeasured,
+Kuningan,Indonesia,IDN,,rejected_too_far,96.6
+Kunming,China,CHN,Panlong Qu/CHN,gazetteer_25km,2.7
+Kushinagar,India,IND,,rejected_too_far,164.1
+Kuwait City,Kuwait,KWT,Al Mansouriya/KWT,gazetteer_25km,2.4
+Kyiv,Ukraine,UKR,Kiev/UKR,gazetteer_25km,1.1
+La Plata,Argentina,ARG,,rejected_too_far,44.7
+Lagos,Nigeria,NGA,Lagos/NGA,gazetteer_25km,7.1
+Lahore,Pakistan,PAK,Lahore/PAK,gazetteer_25km,1.4
+Lakhimpur,India,IND,,rejected_too_far,98.9
+Lakshmipur,Bangladesh,BGD,,rejected_too_far,55.8
+Lanzhou,China,CHN,Lanzhou/CHN,gazetteer_25km,4.9
+Las Vegas,United States of America,USA,Las Vegas Henderson Paradise NV/USA,gazetteer_25km,1.0
+Latur,India,IND,,rejected_too_far,72.7
+Leeds,United Kingdom,GBR,Leeds/GBR,gazetteer_25km,1.9
+León,Mexico,MEX,Leon Guanajuato/MEX,gazetteer_25km,1.7
+Lianyungang,China,CHN,Haizhou Qu/CHN,gazetteer_25km,5.0
+Liaocheng,China,CHN,Liaocheng/CHN,gazetteer_25km,0.2
+Liaoyang,China,CHN,Baita Qu/CHN,gazetteer_25km,1.2
+Libreville,Gabon,GAB,,rejected_country_unmeasured,
+Lille,France,FRA,Lille/FRA,gazetteer_25km,5.6
+Lilongwe,Malawi,MWI,,rejected_country_unmeasured,
+Lima,Peru,PER,Cercado De Lima/PER,gazetteer_25km,0.5
+Linfen,China,CHN,Linfen/CHN,gazetteer_25km,1.6
+Linyi,China,CHN,Linyi/CHN,gazetteer_25km,1.4
+Lisbon,Portugal,PRT,Lisboa/PRT,gazetteer_25km,1.6
+Liuzhou,China,CHN,Liunan Qu/CHN,gazetteer_25km,2.6
+Liverpool,United Kingdom,GBR,Wirral/GBR,gazetteer_25km,4.5
+Ljubljana,Slovenia,SVN,Ljubljana/SVN,gazetteer_25km,1.1
+Lodz,Poland,POL,Lodz/POL,gazetteer_25km,0.7
+Lomé,Togo,TGO,,rejected_country_unmeasured,
+London,United Kingdom,GBR,Westminster/GBR,gazetteer_25km,1.2
+Londrina,Brazil,BRA,,rejected_too_far,334.6
+Long Xuyen,Vietnam,VNM,,rejected_too_far,54.7
+Longgang,China,CHN,Shenzhen Shi/CHN,gazetteer_25km,14.3
+Los Angeles,United States of America,USA,Los Angeles Long Beach Anaheim CA/USA,gazetteer_25km,6.2
+Louisville,United States of America,USA,Louisville Jefferson County KY IN/USA,gazetteer_25km,10.8
+Luanda,Angola,AGO,,rejected_country_unmeasured,
+Lubango,Angola,AGO,,rejected_country_unmeasured,
+Lubumbashi,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Lucknow,India,IND,,rejected_too_far,33.3
+Ludhiana,India,IND,,rejected_too_far,31.2
+Luohe,China,CHN,Luohe/CHN,gazetteer_25km,0.4
+Luoyang,China,CHN,Xigong Qu/CHN,gazetteer_25km,0.8
+Lusaka,Zambia,ZMB,,rejected_country_unmeasured,
+Luxembourg,Luxembourg,LUX,Luxembourg/LUX,gazetteer_25km,0.9
+Luxor,Egypt,EGY,,rejected_too_far,180.5
+Luzhou,China,CHN,Luzhou/CHN,gazetteer_25km,1.7
+Lviv,Ukraine,UKR,,rejected_too_far,467.3
+Lyon,France,FRA,Lyon/FRA,gazetteer_25km,1.3
+Ma'anshan,China,CHN,Maanshan Shi/CHN,gazetteer_25km,0.4
+Maceió,Brazil,BRA,,rejected_too_far,433.8
+Madiun,Indonesia,IDN,,rejected_too_far,300.0
+Madrid,Spain,ESP,Alcorcon/ESP,gazetteer_25km,13.9
+Madurai,India,IND,,rejected_too_far,26.7
+Magelang,Indonesia,IDN,,rejected_too_far,294.3
+Mahagi,Democratic Republic of the Congo,,,rejected_no_geocode,
+Maiduguri,Nigeria,NGA,,rejected_too_far,644.3
+Mainpuri,India,IND,,rejected_too_far,96.0
+Makassar,Indonesia,IDN,,rejected_too_far,606.0
+Makhachkala,Russian Federation,RUS,,rejected_too_far,1585.1
+Malaga,Spain,ESP,Malaga/ESP,gazetteer_25km,3.1
+Malappuram,India,IND,Malappuram/IND,gazetteer_25km,3.2
+Malegaon,India,IND,,rejected_too_far,62.4
+Malé,Maldives,MDV,,rejected_country_unmeasured,
+Managua,Nicaragua,NIC,,rejected_country_unmeasured,
+Manama,Bahrain,BHR,Manama/BHR,gazetteer_25km,4.2
+Manaus,Brazil,BRA,,rejected_too_far,1159.3
+Manchester,United Kingdom,GBR,Manchester/GBR,gazetteer_25km,0.1
+Mandalay,Myanmar,MMR,,rejected_too_far,573.4
+Mangaluru,India,IND,,rejected_too_far,92.4
+Mansoura,Egypt,EGY,,rejected_too_far,120.9
+Maoming,China,CHN,Maonan Qu/CHN,gazetteer_25km,1.6
+Maputo,Mozambique,MOZ,,rejected_country_unmeasured,
+Mar del Plata,Argentina,ARG,,rejected_too_far,361.6
+Maracaibo,Bolivarian Republic of Venezuela,VEN,,rejected_too_far,763.4
+Maracay,Bolivarian Republic of Venezuela,VEN,,rejected_too_far,322.6
+Mardan,Pakistan,PAK,,rejected_too_far,51.7
+Maroua,Cameroon,CMR,,rejected_too_far,690.3
+Marrakesh,Morocco,MAR,Marrakech/MAR,gazetteer_25km,2.3
+Marseille,France,FRA,Marignane/FRA,gazetteer_25km,18.5
+Maseru,Lesotho,LSO,,rejected_country_unmeasured,
+Mashhad,Islamic Republic of Iran,IRN,Mashhad/IRN,gazetteer_25km,4.3
+Massawa,Eritrea,ERI,,rejected_country_unmeasured,
+Mataram,Indonesia,IDN,,rejected_too_far,99.6
+Maturin,Bolivarian Republic of Venezuela,VEN,,rejected_too_far,166.5
+Mau,India,IND,,rejected_too_far,70.2
+Mbuji-Mayi,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Mecca,Saudi Arabia,SAU,Makkah Region/SAU,gazetteer_25km,1.8
+Medan,Indonesia,IDN,,rejected_too_far,995.0
+Medellín,Colombia,COL,Medellin/COL,gazetteer_25km,0.9
+Medina,Saudi Arabia,SAU,Madinah Region/SAU,gazetteer_25km,0.6
+Meerut,India,IND,Ghaziabad/IND,gazetteer_25km,17.0
+Meknes,Morocco,MAR,,rejected_too_far,53.6
+Melbourne,Australia,AUS,Melbourne/AUS,gazetteer_25km,7.1
+Mendoza,Argentina,ARG,,rejected_too_far,881.1
+Mersin,Turkey,TUR,Mersin/TUR,gazetteer_25km,1.7
+Mexicali,Mexico,MEX,Mexicali Baja California/MEX,gazetteer_25km,3.6
+Mexico City,Mexico,MEX,Venustiano Carranza Ciudad de Mexico/MEX,gazetteer_25km,0.9
+Miami,United States of America,USA,Miami Fort Lauderdale West Palm Beach FL/USA,gazetteer_25km,14.9
+Mianyang,China,CHN,Mianyang/CHN,gazetteer_25km,3.4
+Milan,Italy,ITA,Milano/ITA,gazetteer_25km,2.0
+Milwaukee,United States of America,USA,Milwaukee Waukesha West Allis WI/USA,gazetteer_25km,13.2
+Minneapolis [Saint Paul],United States of America,,,rejected_no_geocode,
+Minsk,Belarus,BLR,Minsk/BLR,gazetteer_25km,3.2
+Mirzapur,India,IND,,rejected_too_far,64.5
+Mogadishu,Somalia,SOM,,rejected_country_unmeasured,
+Mojokerto,Indonesia,IDN,,rejected_too_far,275.7
+Mokolo,Cameroon,CMR,,rejected_too_far,667.7
+Mombasa,Kenya,KEN,Mombasa/KEN,gazetteer_25km,5.0
+Monaco,France;Monaco,MCO,,rejected_country_unmeasured,
+Monrovia,Liberia,LBR,,rejected_country_unmeasured,
+Monterrey,Mexico,MEX,Monterrey Nuevo Leon/MEX,gazetteer_25km,1.1
+Montevideo,Uruguay,URY,Montevideo/URY,gazetteer_25km,8.0
+Montreal,Canada,CAN,Montreal/CAN,gazetteer_25km,5.4
+Moradabad,India,IND,Moradabad/IND,gazetteer_25km,1.6
+Morelia,Mexico,MEX,Morelia Michoacan/MEX,gazetteer_25km,1.7
+Moriyama [Otsu],Japan,,,rejected_no_geocode,
+Moscow,Russian Federation,RUS,Moscow/RUS,gazetteer_25km,1.8
+Mosul,Iraq,IRQ,,rejected_too_far,359.4
+Mudanjiang,China,CHN,Dongan Qu/CHN,gazetteer_25km,1.0
+Multan,Pakistan,PAK,,rejected_too_far,204.3
+Mumbai,India,IND,Mumbai/IND,gazetteer_25km,14.8
+Munich,Germany,DEU,Munchen/DEU,gazetteer_25km,2.9
+Muzaffarnagar,India,IND,Muzaffarnagar/IND,gazetteer_25km,2.0
+Muzaffarpur,India,IND,Muzaffarpur/IND,gazetteer_25km,1.6
+Mwanza,United Republic of Tanzania,TZA,,rejected_too_far,712.4
+My Tho,Vietnam,VNM,,rejected_too_far,54.8
+Mymensingh,Bangladesh,BGD,,rejected_too_far,84.1
+Mysuru,India,IND,,rejected_too_far,29.6
+Mérida,Mexico,MEX,Merida Yucatan/MEX,gazetteer_25km,0.7
+N'Djamena,Chad,TCD,,rejected_country_unmeasured,
+Nagoya,Japan,JPN,Nagoya/JPN,gazetteer_25km,6.3
+Nagpur,India,IND,Nagpur/IND,gazetteer_25km,22.5
+Naha,Japan,JPN,Okinawa/JPN,gazetteer_25km,20.5
+Nairobi,Kenya,KEN,Nairobi/KEN,gazetteer_25km,5.5
+Najaf,Iraq,IRQ,,rejected_too_far,47.6
+Namangan,Uzbekistan,UZB,,rejected_too_far,205.0
+Nampula,Mozambique,MOZ,,rejected_country_unmeasured,
+Nanchang,China,CHN,Nanchang/CHN,gazetteer_25km,2.6
+Nanchong,China,CHN,Nanchong/CHN,gazetteer_25km,0.9
+Nanded-Waghala,India,,,rejected_no_geocode,
+Nanjing,China,CHN,Xuanwu/CHN,gazetteer_25km,2.4
+Nanning,China,CHN,Xingning Qu/CHN,gazetteer_25km,0.8
+Nanpara,India,IND,,rejected_too_far,94.2
+Nantong,China,CHN,Chong Chuan Qu/CHN,gazetteer_25km,3.6
+Nanyang,China,CHN,Nanyang/CHN,gazetteer_25km,1.7
+Naples,Italy,ITA,Napoli Greater City/ITA,gazetteer_25km,4.6
+Nashik,India,IND,,rejected_too_far,39.1
+Nasiriyah,Iraq,IRQ,,rejected_too_far,233.3
+Nassau,Bahamas,BHS,Nassau/BHS,gazetteer_25km,0.7
+Natal,Brazil,BRA,,rejected_too_far,833.0
+Neeleshwaram,India,,,rejected_no_geocode,
+Nellore,India,IND,Nellore/IND,gazetteer_25km,0.7
+New Orleans,United States of America,USA,New Orleans Metairie LA/USA,gazetteer_25km,4.6
+New Taipei [Taipei],China,,,rejected_no_geocode,
+New York,United States of America,USA,New York Newark Jersey City NY NJ PA/USA,gazetteer_25km,7.9
+Newcastle upon Tyne,United Kingdom,GBR,Tyneside Conurbation/GBR,gazetteer_25km,1.2
+Niamey,Niger,NER,,rejected_country_unmeasured,
+Nice,France,FRA,Nice/FRA,gazetteer_25km,11.4
+Nicosia,Cyprus,CYP,Lefkosia/CYP,gazetteer_25km,3.9
+Ningbo,China,CHN,Haishu Qu/CHN,gazetteer_25km,3.9
+Nizhny Novgorod,Russian Federation,RUS,,rejected_too_far,401.0
+Noakhali,Bangladesh,,,rejected_no_geocode,
+Nottingham,United Kingdom,GBR,Nottingham/GBR,gazetteer_25km,1.5
+Nouakchott,Mauritania,MRT,,rejected_country_unmeasured,
+Novo Hamburgo,Brazil,BRA,,rejected_too_far,246.1
+Novosibirsk,Russian Federation,RUS,,rejected_too_far,2811.5
+Nuevo Laredo,Mexico,MEX,,rejected_too_far,200.4
+Nur-Sultan,Kazakhstan,KAZ,Astana/KAZ,gazetteer_25km,0.0
+Nuremberg,Germany,DEU,Nurnberg/DEU,gazetteer_25km,2.1
+Nyala,Sudan,SDN,,rejected_country_unmeasured,
+Oaxaca,Mexico,MEX,,rejected_too_far,243.5
+Oboama Nguru,Nigeria,,,rejected_no_geocode,
+Obra,India,IND,,rejected_too_far,34.2
+Odesa,Ukraine,UKR,,rejected_too_far,440.8
+Okayama,Japan,JPN,Okayama/JPN,gazetteer_25km,4.3
+Okene,Nigeria,NGA,,rejected_too_far,188.5
+Oklahoma City,United States of America,USA,Oklahoma OK/USA,gazetteer_25km,7.0
+Omaha,United States of America,USA,Omaha Council Bluffs NE IA/USA,gazetteer_25km,11.9
+Omsk,Russian Federation,RUS,,rejected_too_far,2234.9
+Onitsha,Nigeria,NGA,,rejected_too_far,292.2
+Oran,Algeria,DZA,,rejected_too_far,349.9
+Orlando,United States of America,USA,Orlando Kissimmee Sanford FL/USA,gazetteer_25km,15.4
+Osaka [Kyoto],Japan,,,rejected_no_geocode,
+Oslo,Norway,NOR,Lysaker/NOR,gazetteer_25km,8.9
+Ottawa,Canada,CAN,Ottawa/CAN,gazetteer_25km,3.1
+Ouagadougou,Burkina Faso,BFA,,rejected_country_unmeasured,
+Oujda,Morocco,MAR,Ouejda/MAR,gazetteer_25km,1.7
+Oyo,Nigeria,NGA,,rejected_too_far,75.3
+Padang,Indonesia,IDN,,rejected_too_far,537.2
+Palembang,Indonesia,IDN,South Sumatera/IDN,gazetteer_25km,9.1
+Palermo,Italy,ITA,Palermo/ITA,gazetteer_25km,2.5
+Panama City,Panama,PAN,Panama/PAN,gazetteer_25km,3.8
+Panipat,India,IND,Panipat/IND,gazetteer_25km,0.2
+Panjin,China,CHN,Dawa Qu/CHN,gazetteer_25km,3.8
+Paramaribo,Suriname,SUR,,rejected_country_unmeasured,
+Paris,France,FRA,Paris Greater City/FRA,gazetteer_25km,1.2
+Pati,Indonesia,IDN,,rejected_too_far,230.1
+Patiala,India,IND,Patiala/IND,gazetteer_25km,9.0
+Patna,India,IND,Patna/IND,gazetteer_25km,4.9
+Pekalongan,Indonesia,IDN,,rejected_too_far,228.0
+Pekanbaru,Indonesia,IDN,,rejected_too_far,535.3
+Pereira,Colombia,COL,Pereira/COL,gazetteer_25km,2.0
+Perth,Australia,AUS,Swan/AUS,gazetteer_25km,13.9
+Peshawar,Pakistan,PAK,Peshawar/PAK,gazetteer_25km,3.8
+Philadelphia,United States of America,USA,Philadelphia Camden Wilmington PA NJ DE MD/USA,gazetteer_25km,5.0
+Phnom Penh,Cambodia,KHM,Phnom Penh/KHM,gazetteer_25km,1.6
+Phoenix,United States of America,USA,Phoenix Mesa Scottsdale AZ/USA,gazetteer_25km,15.0
+Pilibhit,India,IND,,rejected_too_far,49.1
+Pingdingshan,China,CHN,Zhanhe Qu/CHN,gazetteer_25km,1.1
+Pingxiang,China,CHN,Anyuan Qu/CHN,gazetteer_25km,1.7
+Pittsburgh,United States of America,USA,Pittsburgh PA/USA,gazetteer_25km,9.0
+Podgorica,Montenegro,MNE,,rejected_too_far,40.0
+Pointe-Noire,Democratic Republic of the Congo,COG,,rejected_country_unmeasured,
+Pontianak,Indonesia,IDN,West Kalimantan/IDN,gazetteer_25km,5.9
+Port Elizabeth,South Africa,ZAF,Nelson Mandela Bay/ZAF,gazetteer_25km,12.4
+Port Harcourt,Nigeria,NGA,,rejected_too_far,410.5
+Port Louis,Mauritius,MUS,,rejected_country_unmeasured,
+Port Moresby,Papua New Guinea,PNG,,rejected_country_unmeasured,
+Port Said,Egypt,EGY,,rejected_too_far,164.1
+Port Sudan,Sudan,SDN,,rejected_country_unmeasured,
+Port of Spain,Trinidad and Tobago,TTO,Port Of Spain/TTO,gazetteer_25km,3.8
+Port-au-Prince,Haiti,HTI,,rejected_country_unmeasured,
+Portland,United States of America,USA,Portland Vancouver Hillsboro OR WA/USA,gazetteer_25km,9.5
+Porto,Portugal,FRA,Bordeaux/FRA,gazetteer_25km,0.4
+Porto Alegre,Brazil,BRA,,rejected_too_far,276.9
+Porto-Novo,Benin,BEN,,rejected_too_far,25.8
+Poznan,Poland,POL,Poznan/POL,gazetteer_25km,1.0
+Prague,Czechia,CZE,Prague/CZE,gazetteer_25km,1.4
+Pratapgarh,India,IND,,rejected_too_far,39.3
+Prayagraj,India,IND,,rejected_too_far,38.2
+Pretoria,South Africa,ZAF,Tshwane/ZAF,gazetteer_25km,12.2
+Prilep,Macedonia,MKD,Prilep/MKD,gazetteer_25km,0.8
+Providence,United States of America,USA,Providence Warwick RI MA/USA,gazetteer_25km,5.1
+Puducherry,India,IND,,rejected_too_far,60.8
+Puebla,Mexico,MEX,Puebla Puebla/MEX,gazetteer_25km,1.2
+Pukou,China,,,rejected_no_geocode,
+Pune,India,IND,Pune/IND,gazetteer_25km,21.7
+Purwokerto,Indonesia,IDN,,rejected_too_far,187.9
+Putian,China,CHN,Putian Shi/CHN,gazetteer_25km,0.1
+Puyang,China,CHN,Yiwu Shi/CHN,gazetteer_25km,22.9
+Pyongyang,Democratic People's Republic of Korea,PRK,,rejected_country_unmeasured,
+Qarshi,Uzbekistan,UZB,,rejected_too_far,406.7
+Qingdao,China,CHN,Shinan Qu/CHN,gazetteer_25km,2.5
+Qingyuan,China,CHN,Qingyuan/CHN,gazetteer_25km,0.2
+Qinhuangdao,China,CHN,Haigang Qu/CHN,gazetteer_25km,1.0
+Qiqihar,China,CHN,Longsha Qu/CHN,gazetteer_25km,2.6
+Qom,Islamic Republic of Iran,IRN,Ghom/IRN,gazetteer_25km,0.1
+Quanzhou,China,CHN,Licheng Qu/CHN,gazetteer_25km,0.5
+Quebec,Canada,CAN,Levis/CAN,gazetteer_25km,3.6
+Querétaro,Mexico,MEX,Santiago de Queretaro Queretaro/MEX,gazetteer_25km,4.6
+Quetta,Pakistan,PAK,,rejected_too_far,594.1
+Quezon City [Manila],Philippines,,,rejected_no_geocode,
+Quito,Ecuador,ECU,Quito/ECU,gazetteer_25km,0.0
+Rabat,Morocco,MAR,Rabat/MAR,gazetteer_25km,1.7
+Rae Bareli,India,IND,,rejected_too_far,90.3
+Raiganj,India,IND,,rejected_too_far,186.6
+Raipur,India,IND,,rejected_too_far,26.6
+Rajamahendravaram,India,IND,Rajahmundry/IND,gazetteer_25km,0.2
+Rajkot,India,IND,,rejected_too_far,37.1
+Rajshahi,Bangladesh,BGD,Rajshahi/BGD,gazetteer_25km,0.3
+Rampur,India,IND,Moradabad/IND,gazetteer_25km,23.8
+Ranchi,India,IND,,rejected_too_far,38.9
+Rangpur,Bangladesh,BGD,,rejected_too_far,165.9
+Rasht,Islamic Republic of Iran,IRN,Rasht/IRN,gazetteer_25km,0.9
+Rawalpindi [Islamabad],Pakistan,,,rejected_no_geocode,
+Recife,Brazil,BRA,,rejected_too_far,632.8
+Reykjavik,Iceland,ISL,Reykjavik/ISL,gazetteer_25km,4.0
+Reynosa,Mexico,MEX,,rejected_too_far,179.3
+Ribeirao Preto,Brazil,BRA,Ribeirao Preto/BRA,gazetteer_25km,0.9
+Riga,Latvia,LVA,Riga/LVA,gazetteer_25km,1.4
+Rio de Janeiro,Brazil,BRA,Rio De Janeiro/BRA,gazetteer_25km,2.3
+Riyadh,Saudi Arabia,SAU,Riyadh Region/SAU,gazetteer_25km,7.2
+Rizhao,China,CHN,Donggang Qu/CHN,gazetteer_25km,1.9
+Rome,Italy,ITA,Roma/ITA,gazetteer_25km,2.2
+Rosario,Argentina,ARG,,rejected_too_far,276.1
+Rostov-on-Don,Russian Federation,RUS,,rejected_too_far,957.9
+Rotterdam [The Hague],Netherlands,,,rejected_no_geocode,
+Rourkela,India,IND,Rajgangpur/IND,gazetteer_25km,15.5
+Rybnitsa,Moldova,MDA,,rejected_country_unmeasured,
+Río Piedras [San Juan],United States of America,,,rejected_no_geocode,
+Sacramento,United States of America,USA,Sacramento Roseville Arden Arcade CA/USA,gazetteer_25km,2.6
+Sagar,India,IND,,rejected_too_far,81.1
+Saharanpur,India,IND,,rejected_too_far,57.3
+Saint Petersburg,Russian Federation,RUS,,rejected_too_far,636.3
+Salem,India,ISR,Allon Shevut/PSE,gazetteer_25km,15.6
+Salt Lake City,United States of America,USA,Salt Lake City UT/USA,gazetteer_25km,12.6
+Salta,Argentina,ARG,,rejected_too_far,1281.5
+Saltillo,Mexico,MEX,Saltillo Coahuila/MEX,gazetteer_25km,1.8
+Salvador,Brazil,BRA,,rejected_too_far,34.7
+Samara,Russian Federation,RUS,,rejected_too_far,854.1
+Samarinda,Indonesia,IDN,,rejected_too_far,748.4
+Samarkand,Uzbekistan,UZB,,rejected_too_far,272.6
+Sambhal,India,IND,,rejected_too_far,33.9
+Samsun,Turkey,TUR,Samsun/TUR,gazetteer_25km,0.5
+San Antonio,United States of America,USA,San Antonio New Braunfels TX/USA,gazetteer_25km,14.0
+San Jose [Costa Rica],Costa Rica,,,rejected_no_geocode,
+San Jose [USA],United States of America,,,rejected_no_geocode,
+San Luis Potosí,Mexico,MEX,San Luis Potosi San Luis Potosi/MEX,gazetteer_25km,2.6
+San Miguel de Tucumán,Argentina,ARG,,rejected_too_far,1081.9
+San Pedro Sula,Honduras,HND,,rejected_too_far,181.5
+San Salvador,El Salvador,SLV,San Salvador/SLV,gazetteer_25km,3.4
+Sana'a,Yemen,YEM,,rejected_country_unmeasured,
+Sandila,India,IND,,rejected_too_far,45.3
+Sangli,India,IND,,rejected_too_far,55.8
+Sansarpur,India,,,rejected_no_geocode,
+Santa Cruz de la Sierra,Bolivia,BOL,,rejected_country_unmeasured,
+Santiago,Chile,CHL,Santiago/CHL,gazetteer_25km,1.4
+Santiago de los Caballeros,Dominican Republic,DOM,,rejected_too_far,26.1
+Santo Domingo,Dominican Republic,DOM,Distrito Nacional/DOM,gazetteer_25km,4.2
+Santos,Brazil,BRA,Santos/BRA,gazetteer_25km,2.6
+Sao Goncalo,Brazil,BRA,Rio De Janeiro/BRA,gazetteer_25km,17.2
+Sao Jose dos Campos,Brazil,BRA,Sao Jose Dos Campos/BRA,gazetteer_25km,4.9
+Sapporo,Japan,JPN,Sapporo/JPN,gazetteer_25km,2.2
+Sarajevo,Bosnia and Herzegovina,BIH,Ilidza/BIH,gazetteer_25km,4.2
+Saratov,Russian Federation,RUS,,rejected_too_far,721.3
+Sargodha,Pakistan,PAK,,rejected_too_far,83.7
+Satna,India,IND,,rejected_too_far,73.8
+Seattle,United States of America,USA,Seattle Tacoma Bellevue WA/USA,gazetteer_25km,13.3
+Seeb,Oman,OMN,,rejected_country_unmeasured,
+Semarang,Indonesia,IDN,,rejected_too_far,292.0
+Sendai,Japan,JPN,Sendai/JPN,gazetteer_25km,2.9
+Seoul,Republic of Korea,KOR,Seoul/KOR,gazetteer_25km,2.5
+Serrekunda,Gambia,GMB,,rejected_country_unmeasured,
+Seville,Spain,ESP,Sevilla/ESP,gazetteer_25km,1.4
+Sfax,Tunisia,TUN,,rejected_country_unmeasured,
+Sha Tin,China,HKG,,rejected_country_unmeasured,
+Shahabad,India,IND,,rejected_too_far,49.4
+Shahjahanpur,India,IND,,rejected_too_far,71.0
+Shanghai,China,CHN,Xietu Road/CHN,gazetteer_25km,2.8
+Shangqiu,China,CHN,Suiyang Qu/CHN,gazetteer_25km,1.3
+Shaoyang,China,CHN,Shaoyang/CHN,gazetteer_25km,0.9
+Sheffield,United Kingdom,GBR,Sheffield/GBR,gazetteer_25km,2.2
+Shenyang,China,CHN,Shenyang/CHN,gazetteer_25km,1.6
+Shijiazhuang,China,CHN,Shijiazhuang/CHN,gazetteer_25km,1.3
+Shiraz,Islamic Republic of Iran,IRN,Shiraz/IRN,gazetteer_25km,5.5
+Shiyan,China,CHN,Shiyan Shi/CHN,gazetteer_25km,0.3
+Shizuoka,Japan,JPN,Shizuoka/JPN,gazetteer_25km,1.7
+Shymkent,Kazakhstan,KAZ,,rejected_too_far,158.8
+Sialkot,Pakistan,PAK,,rejected_too_far,105.3
+Sikar,India,IND,,rejected_too_far,104.3
+Silchar,India,IND,,rejected_too_far,60.3
+Siliguri,India,IND,,rejected_too_far,61.3
+Sincan,Turkey,,,rejected_no_geocode,
+Singapore,Singapore,SGP,Singapore/SGP,gazetteer_25km,8.2
+Sirajganj,Bangladesh,BGD,,rejected_too_far,88.4
+Sitamarhi,India,IND,,rejected_too_far,54.9
+Sitapur,India,IND,,rejected_too_far,64.9
+Skopje,Macedonia,MKD,Skopje/MKD,gazetteer_25km,0.9
+Sofia,Bulgaria,BGR,Sofia/BGR,gazetteer_25km,2.7
+Sohag,Egypt,EGY,,rejected_too_far,299.8
+Sokoto,Nigeria,NGA,,rejected_too_far,374.4
+Solapur,India,IND,,rejected_too_far,32.5
+Sorocaba,Brazil,BRA,,rejected_too_far,63.5
+Srinagar,India,IND,Srinagar/IND,gazetteer_25km,6.0
+St. Louis,United States of America,USA,,rejected_too_far,25.0
+Stockholm,Sweden,SWE,Stockholm/SWE,gazetteer_25km,0.9
+Stuttgart,Germany,DEU,Stuttgart/DEU,gazetteer_25km,1.3
+Sulaymaniyah,Iraq,IRQ,,rejected_too_far,271.0
+Sultanpur,India,IND,,rejected_too_far,73.1
+Sumenep,Indonesia,IDN,,rejected_too_far,234.1
+Surabaya,Indonesia,IDN,,rejected_too_far,258.5
+Surat,India,IND,,rejected_too_far,28.5
+Suva,Fiji,FJI,Suva/FJI,gazetteer_25km,3.2
+Suzhou,China,CHN,Gusu Qu/CHN,gazetteer_25km,1.4
+Swat City,Pakistan,,,rejected_no_geocode,
+Sydney,Australia,AUS,,rejected_too_far,73.4
+Sylhet,Bangladesh,BGD,Sylhet/BGD,gazetteer_25km,0.6
+São Luís,Brazil,BRA,Sao Luis/BRA,gazetteer_25km,8.3
+São Paulo,Brazil,BRA,Sao Paulo/BRA,gazetteer_25km,4.8
+Ta'izz,Yemen,YEM,,rejected_country_unmeasured,
+Tabriz,Islamic Republic of Iran,IRN,Urmia/IRN,gazetteer_25km,1.5
+Tahoua,Niger,NER,,rejected_country_unmeasured,
+Tai'an,China,CHN,Taian/CHN,gazetteer_25km,1.3
+Taichung,China,TWN,,rejected_country_unmeasured,
+Tainan,China,TWN,,rejected_country_unmeasured,
+Taiyuan,China,CHN,Yingze Qu/CHN,gazetteer_25km,2.1
+Taizhou,China,CHN,Hailing Qu/CHN,gazetteer_25km,2.2
+Takasaki [Maebashi],Japan,,,rejected_no_geocode,
+Takoradi [Sekondi-Takoradi],Ghana,,,rejected_no_geocode,
+Tallinn,Estonia,EST,Tallinn/EST,gazetteer_25km,2.9
+Tamluk,India,IND,Haldia/IND,gazetteer_25km,23.5
+Tampa,United States of America,USA,Tampa St Petersburg Clearwater FL/USA,gazetteer_25km,9.6
+Tampico,Mexico,MEX,,rejected_too_far,182.8
+Tangail,Bangladesh,BGD,,rejected_too_far,58.2
+Tangier,Morocco,MAR,Tanger/MAR,gazetteer_25km,1.1
+Tangshan,China,CHN,Lubei Qu/CHN,gazetteer_25km,0.4
+Tanta,Egypt,EGY,,rejected_too_far,104.8
+Tashkent,Uzbekistan,UZB,Tashkent/UZB,gazetteer_25km,12.3
+Tasikmalaya,Indonesia,IDN,,rejected_too_far,81.5
+Tbilisi,Georgia,GEO,Tbilisi/GEO,gazetteer_25km,5.1
+Tegal,Indonesia,IDN,,rejected_too_far,169.0
+Tegucigalpa,Honduras,HND,Tegucigalpa/HND,gazetteer_25km,1.6
+Tehran,Islamic Republic of Iran,IRN,Tehran/IRN,gazetteer_25km,2.8
+Tel Aviv,Israel,ISR,Ramat Gan/ISR,gazetteer_25km,4.5
+Teresina,Brazil,BRA,,rejected_too_far,322.0
+Tetovo,Macedonia,MKD,Tetovo/MKD,gazetteer_25km,1.5
+Thalassery,India,IND,Kannur/IND,gazetteer_25km,19.2
+Thanagaon,India,,,rejected_no_geocode,
+Thessaloniki,Greece,GRC,Thessaloniki/GRC,gazetteer_25km,1.4
+Thiruvananthapuram,India,IND,Trivendrum/IND,gazetteer_25km,6.0
+Thrissur,India,IND,,rejected_too_far,44.8
+Tianjiaan,China,,,rejected_no_geocode,
+Tianjin,China,CHN,Hongqiao Qu/CHN,gazetteer_25km,3.8
+Tijuana,United States of America,MEX,Tijuana Baja California/MEX,gazetteer_25km,5.3
+Tirana,Albania,ALB,Tirana/ALB,gazetteer_25km,1.9
+Tiraspol,Moldova,MDA,,rejected_country_unmeasured,
+Tiruchirappalli,India,IND,,rejected_too_far,44.7
+Tirupati,India,IND,,rejected_too_far,39.9
+Tiruppur,India,IND,,rejected_too_far,44.5
+Tokyo,Japan,JPN,Shinjuku Ward/JPN,gazetteer_25km,2.2
+Toluca,Mexico,MEX,Toluca Mexico/MEX,gazetteer_25km,0.2
+Tolyatti,Russian Federation,RUS,,rejected_too_far,791.7
+Tomsk,Russian Federation,RUS,,rejected_too_far,2877.8
+Tongliao,China,CHN,Keerqin Qu/CHN,gazetteer_25km,3.2
+Toronto,Canada,CAN,Toronto/CAN,gazetteer_25km,3.9
+Torreon,Mexico,MEX,,rejected_too_far,208.5
+Touba,Senegal,SEN,,rejected_too_far,163.0
+Toulouse,France,FRA,Toulouse/FRA,gazetteer_25km,2.0
+Tripoli,Libya,LBY,,rejected_country_unmeasured,
+Trujillo,Peru,PER,,rejected_too_far,474.6
+Tshikapa,Democratic Republic of the Congo,COD,,rejected_country_unmeasured,
+Tucson,United States of America,USA,Tucson AZ/USA,gazetteer_25km,23.0
+Tulsipur,India,NPL,,rejected_too_far,165.5
+Tulungagung,Indonesia,IDN,,rejected_too_far,341.5
+Tunis,Tunisia,TUN,,rejected_country_unmeasured,
+Turin,Italy,ITA,Torino/ITA,gazetteer_25km,2.2
+Tuxtla Gutiérrez,Mexico,MEX,,rejected_too_far,206.7
+Tyumen,Russian Federation,RUS,,rejected_too_far,1709.6
+Uberlândia,Brazil,BRA,,rejected_too_far,238.3
+Uchkagaon,India,,,rejected_no_geocode,
+Udaipur,India,IND,Udaipur/IND,gazetteer_25km,24.0
+Ufa,Russian Federation,RUS,,rejected_too_far,1164.2
+Ujjain,India,IND,Ujjain/IND,gazetteer_25km,20.5
+Ulaanbaatar,Mongolia,MNG,Ulaanbaatar/MNG,gazetteer_25km,2.6
+Ulsan,Republic of Korea,KOR,Ulsan/KOR,gazetteer_25km,1.4
+Unnao,India,IND,Kanpur/IND,gazetteer_25km,13.2
+Urmia,Islamic Republic of Iran,IRN,Uromieh/IRN,gazetteer_25km,0.4
+Uyo,Nigeria,NGA,,rejected_too_far,465.9
+Vadodara,India,IND,Vadodara/IND,gazetteer_25km,13.6
+Valencia [Spain],Bolivarian Republic of Venezuela,,,rejected_no_geocode,
+Valencia [Venezuela],Spain,,,rejected_no_geocode,
+Valletta,Malta,MLT,Valletta/MLT,gazetteer_25km,2.0
+Vancouver,Canada,CAN,Vancouver/CAN,gazetteer_25km,3.2
+Varanasi,India,IND,Varanasi/IND,gazetteer_25km,21.2
+Vasai-Virar,India,,,rejected_no_geocode,
+Vellore,India,IND,,rejected_too_far,33.4
+Veracruz,Mexico,MEX,Veracruz Veracruz/MEX,gazetteer_25km,1.0
+Vienna,Austria,AUT,Wien/AUT,gazetteer_25km,8.0
+Vientiane,Laos,LAO,Vientiane/LAO,gazetteer_25km,8.9
+Vijayapura,India,IND,,rejected_too_far,103.4
+Vijayawada,India,IND,Guntur/IND,gazetteer_25km,7.9
+Vila Velha,Brazil,BRA,Vila Velha/BRA,gazetteer_25km,3.3
+Villahermosa,Mexico,MEX,,rejected_too_far,170.9
+Vilnius,Lithuania,LTU,Vilnius/LTU,gazetteer_25km,1.4
+Virginia Beach,United States of America,USA,,rejected_too_far,29.2
+Visakhapatnam,India,IND,Vizag/IND,gazetteer_25km,4.1
+Viña del Mar [Valparaíso],Chile,,,rejected_no_geocode,
+Vladivostok,Russian Federation,RUS,,rejected_too_far,6415.9
+Volgograd,Russian Federation,RUS,,rejected_too_far,909.3
+Voronezh,Russian Federation,RUS,,rejected_too_far,464.0
+Wad Madan,Sudan,,,rejected_no_geocode,
+Wah Cantonment,Pakistan,PAK,,rejected_too_far,31.0
+Waidhan,India,,,rejected_no_geocode,
+Warangal,India,IND,,rejected_too_far,36.6
+Warri,Nigeria,NGA,,rejected_too_far,260.3
+Warsaw,Poland,POL,Warszawa/POL,gazetteer_25km,0.8
+Washington D.C.,United States of America,USA,Washington Arlington Alexandria DC VA MD WV/USA,gazetteer_25km,8.1
+Weicheng Qu,China,,,rejected_no_geocode,
+Weifang,China,CHN,Kuiwen Qu/CHN,gazetteer_25km,2.8
+Weihai,China,CHN,Huancui Qu/CHN,gazetteer_25km,2.8
+Wenzhou,China,CHN,Lucheng Qu/CHN,gazetteer_25km,1.2
+Windhoek,Namibia,NAM,,rejected_country_unmeasured,
+Winnipeg,Canada,CAN,Winnipeg/CAN,gazetteer_25km,1.5
+Wroclaw,Poland,POL,Wroclaw/POL,gazetteer_25km,1.9
+Wuhan,China,CHN,Wuhan Shi/CHN,gazetteer_25km,2.1
+Wuhu,China,CHN,Wuhu/CHN,gazetteer_25km,5.2
+Wuppertal,Germany,DEU,Wuppertal/DEU,gazetteer_25km,3.2
+Xalapa,Mexico,MEX,Xalapa Veracruz/MEX,gazetteer_25km,1.7
+Xi'an,China,CHN,Xi An/CHN,gazetteer_25km,3.5
+Xiamen,China,CHN,Huli Qu/CHN,gazetteer_25km,3.1
+Xiangtan,China,CHN,Yuetang Qu/CHN,gazetteer_25km,2.7
+Xiaogan,China,CHN,Xiaogan/CHN,gazetteer_25km,1.2
+Xingtai,China,CHN,Xingtai Shi/CHN,gazetteer_25km,0.6
+Xining,China,CHN,Chengxi Qu/CHN,gazetteer_25km,2.1
+Xinxiang,China,CHN,Weibin District Xinxiang/CHN,gazetteer_25km,11.8
+Xuchang,China,CHN,Xuchang/CHN,gazetteer_25km,4.0
+Xuzhou,China,CHN,Yunlong Qu/CHN,gazetteer_25km,2.8
+Yamunanagar,India,IND,,rejected_too_far,50.1
+Yancheng,China,CHN,Tinghu Qu/CHN,gazetteer_25km,3.6
+Yangon,Myanmar,MMR,Yangon/MMR,gazetteer_25km,2.3
+Yangzhou,China,CHN,Yangzhou/CHN,gazetteer_25km,1.1
+Yantai,China,CHN,Laishan Qu/CHN,gazetteer_25km,0.9
+Yaounde,Cameroon,CMR,Yaoude/CMR,gazetteer_25km,0.0
+Yaroslavl,Russian Federation,RUS,,rejected_too_far,251.0
+Yazd,Islamic Republic of Iran,IRN,Yazd/IRN,gazetteer_25km,1.0
+Yekaterinburg,Russian Federation,RUS,,rejected_too_far,1416.8
+Yerevan,Armenia,ARM,,rejected_country_unmeasured,
+Yibin,China,CHN,Cuiping Qu/CHN,gazetteer_25km,1.6
+Yichang,China,CHN,Xiling Qu/CHN,gazetteer_25km,1.6
+Yinchuan,China,CHN,Xingqing Qu/CHN,gazetteer_25km,1.8
+Yiwu,China,CHN,Yiwu Shi/CHN,gazetteer_25km,1.2
+Yiyang,China,CHN,Heshan Qu/CHN,gazetteer_25km,0.9
+Yogyakarta,Indonesia,IDN,,rejected_too_far,319.4
+Yueqing,China,,,rejected_no_geocode,
+Yueyang,China,CHN,Yueyanglou Qu/CHN,gazetteer_25km,5.0
+Yulin,China,CHN,Yuzhou Qu/CHN,gazetteer_25km,0.9
+Zagreb,Croatia,HRV,Zagreb/HRV,gazetteer_25km,1.7
+Zahedan,Islamic Republic of Iran,IRN,,rejected_too_far,181.0
+Zanzibar City,United Republic of Tanzania,TZA,,rejected_too_far,184.9
+Zaporizhzhia,Ukraine,UKR,,rejected_too_far,441.9
+Zaragoza,Spain,MEX,Tijuana Baja California/MEX,gazetteer_25km,5.3
+Zaria,Nigeria,NGA,,rejected_too_far,79.7
+Zhangjiagang,China,CHN,Zhangjiagang Shi/CHN,gazetteer_25km,1.4
+Zhangjiakou,China,CHN,Zhangjiakou/CHN,gazetteer_25km,9.0
+Zhangzhou,China,CHN,Zhangzhou Shi/CHN,gazetteer_25km,5.6
+Zhanjiang,China,CHN,Zhanjiang/CHN,gazetteer_25km,0.5
+Zhaoqing,China,CHN,Duanzhou Qu/CHN,gazetteer_25km,1.9
+Zhengzhou,China,CHN,Zhengzhou/CHN,gazetteer_25km,0.6
+Zhenjiang,China,CHN,Runzhou Qu/CHN,gazetteer_25km,3.0
+Zhongshan,China,CHN,Zongshan/CHN,gazetteer_25km,0.9
+Zhuhai,China,CHN,Zhuhai/CHN,gazetteer_25km,10.9
+Zhuzhou,China,CHN,Tianyuan Qu/CHN,gazetteer_25km,1.8
+Zibo,China,CHN,Zhangdian Qu/CHN,gazetteer_25km,3.9
+Zigong,China,CHN,Zigong/CHN,gazetteer_25km,1.4
+Zinder,Niger,NER,,rejected_country_unmeasured,
+Zunyi,China,CHN,Zunyi/CHN,gazetteer_25km,2.2
+Zurich,Switzerland,CHE,Zurich/CHE,gazetteer_25km,1.6
+Ürümqi,China,CHN,Shayibake Qu/CHN,gazetteer_25km,3.6
