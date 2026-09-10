@@ -13,6 +13,7 @@ import pandas as pd
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
 from clock_model.model import cox, centring, fit as FIT
 from clock_model.evaluate import gates as G
+from clock_model.evaluate import baseline_gates as BG
 from clock_model.evaluate import ontology_gates as OG
 from clock_model.export import bundle
 
@@ -65,7 +66,24 @@ def main() -> None:
                 "young": centring.reference_vector(fit["prediction_coefs"], rates, prevalence, age=40),
                 "old": centring.reference_vector(fit["prediction_coefs"], rates, prevalence, age=60),
             }
-    root = bundle.assemble(ARTIFACTS, args.version, fit, gates, built)
+    # The baseline gates ran only on the train path, so this script could emit a bundle nothing had
+    # checked — and since it now carries the whole prior baseline forward, that bundle would re-assert
+    # the upstream digests and retrieval date of a download it never made. The witness gate cannot
+    # pass here by design (no Eurostat fetch happens offline), so it is reported and excluded rather
+    # than silently skipped: what this path can check, it must.
+    results = BG.check(built, witness=None)
+    offline = [(n, ok, d) for n, ok, d in results if "independent source" not in n]
+    failed = [f"{n}: {d}" for n, ok, d in offline if not ok]
+    if failed:
+        for f in failed:
+            print(f"[gate] REFUSED — {f}")
+        sys.exit(f"[gate] {len(failed)} baseline gate(s) failed — bundle not written.")
+    print(f"[gate] {len(offline)} baseline gates passed; the cross-source witness was NOT re-run "
+          f"(this path makes no network call — the bundle records that)")
+    root = bundle.assemble(ARTIFACTS, args.version, fit, gates, built,
+                           baseline_gates=offline + [("an independent source agrees within the "
+                                                      "declared band", False,
+                                                      "not re-run: offline re-export")])
     print(f"[reexport] wrote {root}  ({len(built)} countries, {len(fit['prediction_coefs'])} coefficients)")
 
 

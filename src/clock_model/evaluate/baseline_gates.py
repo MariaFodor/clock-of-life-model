@@ -27,6 +27,18 @@ MAX_WITNESS_WORST = 2.0
 MIN_WITNESS_RANK_CORR = 0.85
 #: A world that stopped being the world.
 MIN_COUNTRIES = 230
+#: The scoreable set is 30 hand-maintained European countries. Gating it at "non-empty" let
+#: `--countries RO` produce a fully green bundle that drops 29 countries out of /api/meta.
+MIN_SCOREABLE = 25
+#: The countries known to have no EHIS prevalence. An ALLOWLIST, not a predicate: the previous gate
+#: asked whether the fallback was declared, and `train.py` declares it in the same branch that
+#: creates it — so the gate was tautological with its only producer and could not fail. An EHIS
+#: outage would have shipped all 30 European countries centred on a fabricated reference person with
+#: every gate green.
+EXPECTED_FALLBACKS = {"CH"}
+#: 30 countries x 2 sexes. A partial Eurostat outage leaving 10 pairs used to pass, reporting a
+#: healthy median over a sixth of the intended coverage.
+MIN_WITNESS_PAIRS = 48
 
 
 def _e(qx: dict, age: int) -> float:
@@ -98,23 +110,36 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
     # A country may fall back to the cohort mean — Switzerland does today, because EHIS publishes
     # nothing usable for it — but it must SAY so. An undeclared fallback is a reference person from
     # another continent wearing this country's name.
-    undeclared = [iso for iso, b in baselines.items()
-                  if b.get("reference_lp") is not None and not b.get("prevalence")
-                  and "fallback" not in (b.get("prevalence_source") or "")]
-    out.append(("no country is centred on a fallback it does not declare",
-                not undeclared, f"{len(undeclared)}: {undeclared[:5]}"))
-    declared = sorted(iso for iso, b in baselines.items()
-                      if b.get("reference_lp") is not None and not b.get("prevalence"))
-    out.append(("every fallback is visible in the bundle", True,
-                f"cohort-mean fallback: {declared or 'none'}"))
+    fallbacks = {iso for iso, b in baselines.items()
+                 if b.get("reference_lp") is not None and not b.get("prevalence")}
+    out.append(("only the countries known to lack prevalence fall back to a fabricated reference",
+                fallbacks <= EXPECTED_FALLBACKS,
+                f"expected {sorted(EXPECTED_FALLBACKS)}, got {sorted(fallbacks)}"))
+    # A partial dict is truthy, so a country whose smoking dataset dropped out while its weight one
+    # held would be labelled "Eurostat EHIS" while being centred on a non-smoker.
+    partial = sorted(iso for iso, b in baselines.items()
+                     if b.get("prevalence") and
+                     not {"current_smoking", "overweight_plus"} <= set(b["prevalence"]))
+    out.append(("no country is centred on half a prevalence record", not partial, f"{partial[:5]}"))
+    # The structural tell for a degenerate reference person: with no prevalence, every _x_young
+    # interaction is zero, so the young and old centrings collapse to the same number. It is not
+    # derived from the same predicate the declaration is, which is the point.
+    collapsed = sorted(iso for iso, b in baselines.items()
+                       if (lp := b.get("reference_lp")) and lp["young"] == lp["old"])
+    out.append(("no country's young and old centrings have collapsed together",
+                set(collapsed) <= EXPECTED_FALLBACKS, f"collapsed: {collapsed}"))
     scoreable = [iso for iso, b in baselines.items() if b.get("reference_lp") is not None]
-    out.append(("the scoreable set is non-empty and every member is centred", bool(scoreable),
-                f"{len(scoreable)} scoreable of {len(baselines)}"))
+    out.append((f"at least {MIN_SCOREABLE} countries can actually be scored",
+                len(scoreable) >= MIN_SCOREABLE, f"{len(scoreable)} scoreable of {len(baselines)}"))
 
     # ── G5 aliases resolve ────────────────────────────────────────────────────
+    # Against the SCOREABLE set, not merely the drawable one: the alias exists so a stored `EL`
+    # still gets a number. If GR were reference-only the alias would resolve, the gate would pass,
+    # and every Greek user would get a 400 with the release green.
+    scoreable_set = {iso for iso, b in baselines.items() if b.get("reference_lp") is not None}
     bad_alias = [f"{k}->{v}" for k, v in wpp.ALIASES.items()
-                 if v not in baselines or k in baselines]
-    out.append(("every country alias resolves to a real baseline and shadows nothing",
+                 if v not in scoreable_set or k in baselines]
+    out.append(("every country alias resolves to a country that can be scored",
                 not bad_alias, f"{bad_alias}"))
 
     # ── G2 the independent witness ────────────────────────────────────────────
@@ -134,9 +159,10 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
                 ours, theirs = _e(b["qx"][sex], 0), remaining_le(tables[sex], 0, 1.0)
                 deltas.append((abs(ours - theirs), f"{iso}/{sex}"))
                 pairs.append((ours, theirs))
-        if len(pairs) < 10:
+        if len(pairs) < MIN_WITNESS_PAIRS:
             out.append(("an independent source agrees within the declared band", False,
-                        f"witness covered only {len(pairs)} tables"))
+                        f"witness covered only {len(pairs)} of the {MIN_WITNESS_PAIRS} tables "
+                        f"required — a cross-check over a sixth of the countries is not one"))
         else:
             med = statistics.median(d for d, _ in deltas)
             worst_d, worst_iso = max(deltas)

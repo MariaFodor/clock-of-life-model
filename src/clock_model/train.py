@@ -73,12 +73,16 @@ def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str]) -> dict
             continue
         prevalence = eurostat.fetch_prevalence(geo)
         built[iso2]["prevalence"] = prevalence
-        # Switzerland publishes no EHIS figures, so its reference person falls back to the cohort
-        # mean — which is what ships today. Keeping it scoreable preserves that; RECORDING the
-        # fallback is what stops it being invisible, and the gate refuses an undeclared one.
+        # Switzerland publishes no EHIS figures. Calling what happens next a "cohort-mean fallback"
+        # would be false: `cohort_rates` carries no current-smoking rate at all, so the smoking term
+        # is simply 0 and the reference person is a NON-SMOKER of cohort-average weight — a healthier
+        # reference than the country's average, which inflates every Swiss user's relative risk (by
+        # x1.125 as measured). It ships that way today and this PR does not change the number; what
+        # it changes is that the artifact now says what the number actually is.
         built[iso2]["prevalence_source"] = (
             f"Eurostat EHIS ({geo})" if prevalence
-            else f"cohort-mean fallback — EHIS publishes no usable figures for {geo}")
+            else (f"NO PREVALENCE for {geo} — reference person is a non-smoker of cohort-average "
+                  f"weight, not this country's average person; relative risk here is overstated"))
         built[iso2]["reference_lp"] = {
             "young": centring.reference_vector(coefs, rates, prevalence, age=40),
             "old": centring.reference_vector(coefs, rates, prevalence, age=60),
@@ -124,7 +128,8 @@ def train(country_list, version, from_raw=False):
             witness[geo] = eurostat.fetch_lifetable(geo, LIFETABLE_YEAR)
         except Exception as e:                                    # noqa: BLE001
             print(f"        witness: {geo} unavailable ({e})")
-    bl_failed = [f"{n}: {d}" for n, ok, d in BG.check(built, witness=witness) if not ok]
+    bl_results = BG.check(built, witness=witness)
+    bl_failed = [f"{n}: {d}" for n, ok, d in bl_results if not ok]
     if bl_failed:
         for f in bl_failed:
             print(f"[gate] REFUSED — {f}")
@@ -133,7 +138,7 @@ def train(country_list, version, from_raw=False):
         sys.exit(f"[gate] {len(bl_failed)} baseline gate(s) failed — bundle not written.")
     print(f"[gate] baseline gates passed ({len(built)} countries)")
 
-    root = bundle.assemble(ARTIFACTS, version, fit, gates, built)
+    root = bundle.assemble(ARTIFACTS, version, fit, gates, built, baseline_gates=bl_results)
     print(f"[train] bundle → {root}")
     # sanity: RO average ≈ national LE
     if "RO" in built:
