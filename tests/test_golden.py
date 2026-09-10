@@ -59,14 +59,24 @@ def main():
     le_avg = baselines.remaining_le(qxM, 40, 1.0)     # RR=1 by construction for the average
     checks.append(("avg-RO male LE@40 ≈ national 34.5", abs(le_avg - lt["LIFEXP_M"]["Y40"]) < 0.6))
 
-    # Bundle-content checks (LEV-01): the exported v2.2.0 artifact must carry the literature
-    # standardizers, centring references, the corrected env role, and a data-vintage stamp.
-    broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", "model-v3.0.1")
+    # Bundle-content checks (LEV-01): the shipped artifact must carry the literature standardizers,
+    # centring references, the corrected env role, and a data-vintage stamp.
+    BUNDLE = "model-v3.0.2"
+    broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", BUNDLE)
     if not os.path.isdir(broot):
-        sys.exit("GOLDEN: PRECONDITION MISSING — artifacts/model-v3.0.1 not found. Generate it first:\n"
-                 "  PYTHONPATH=src .venv/bin/python reexport_offline.py --from-version 3.0.0 --version 3.0.1")
+        sys.exit(f"GOLDEN: PRECONDITION MISSING — artifacts/{BUNDLE} not found. Generate it first:\n"
+                 f"  PYTHONPATH=src python3 reexport_offline.py --from-version 3.0.1 --version 3.0.2")
     coefs = json.load(open(os.path.join(broot, "coefficients.json")))
-    checks.append(("bundle ships the ontology", os.path.exists(os.path.join(broot, "ontology.json"))))
+    ont_path = os.path.join(broot, "ontology.json")
+    checks.append(("bundle ships the ontology", os.path.exists(ont_path)))
+    bundle_ont = json.load(open(ont_path)) if os.path.exists(ont_path) else {}
+    # The intervention evidence is the only citation the SERVICE renders that is not a factor's own
+    # prior, and it reaches the reader by the ontology travelling verbatim into the bundle. "Copied
+    # verbatim" is exactly the kind of thing that stays true until someone filters the copy.
+    ie = (bundle_ont.get("cigs_day") or {}).get("intervention_evidence") or {}
+    checks.append(("bundle ships cigs_day's intervention evidence",
+                   {s.get("doi") for s in ie.get("sources", [])}
+                   == {"10.1093/aje/kwf150", "10.1136/tc.2005.011932"}))
     # A current smoker who skips the dose question must not be scored as smoking zero a day: since
     # the contrast fix, smk_current no longer absorbs dose, so the bundle has to supply the neutral
     # value rather than leaving the service to invent one.

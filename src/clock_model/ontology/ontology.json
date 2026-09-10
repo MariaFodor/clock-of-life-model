@@ -13,7 +13,16 @@
     "  causes        DOWNSTREAM nodes — mediators; NEVER adjusted for in a total-effect estimand",
     "  confounded_by UPSTREAM common causes — always adjusted for",
     "  prior         literature effect size with a VERIFIED doi (Crossref-checked at the stated date)",
-    "  study         slug into the service's study table"
+    "  study         slug into the service's study table",
+    "  companions    other indicators of the SAME categorical exposure — kept together so the",
+    "                reference group stays what the prior measured",
+    "  grade         strong | moderate | weak | na — the evidence grade shown to the reader",
+    "  clip_expected a sign constraint we EXPECT to bind, with clip_reason; an unexpected clip refuses",
+    "  waived_confounders  declared confounders we cannot adjust for, with waiver_reason",
+    "  intervention_evidence  sources qualifying how a LEVER may be acted on, not the coefficient's",
+    "                value — e.g. that cutting down is worth less than the per-cigarette slope",
+    "                implies. Same citation bar as prior: verified doi, and each source says which",
+    "                claim it supports."
   ],
   "_meta": {
     "version": "1.0.0",
@@ -30,7 +39,7 @@
       "measured": "2026-09-09"
     },
     "citations_verified_against": "https://api.crossref.org/works/{doi}",
-    "citations_verified_on": "2026-09-09"
+    "citations_verified_on": "2026-09-10"
   },
   "age": {
     "role": "baseline",
@@ -265,7 +274,7 @@
           "year": 2002,
           "verified": "2026-09-10",
           "supports": "reduction_without_cessation_shows_little_to_no_all_cause_mortality_benefit",
-          "design": "prospective cohort — deliberately NOT trials: reduction trials are powered for cessation, not mortality"
+          "design": "prospective cohort, 19,732 people, 16-year follow-up"
         },
         {
           "doi": "10.1136/tc.2005.011932",
@@ -274,9 +283,10 @@
           "year": 2005,
           "verified": "2026-09-10",
           "supports": "dose_response_is_concave_the_first_few_cigarettes_carry_more_than_their_share",
-          "design": "prospective cohort, 42,722 people"
+          "design": "prospective cohort, 42,722 people, ~27-year follow-up"
         }
-      ]
+      ],
+      "why_cohort": "Cohort, deliberately not trials: reduction trials are powered for cessation, not mortality, so they cannot settle what reducing does to how long you live. The note said “trials” until review caught it."
     }
   },
   "activity": {

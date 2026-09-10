@@ -89,7 +89,12 @@ def levers(ont: dict | None = None) -> list[str]:
 
 
 def citation_problems(ont: dict | None = None) -> list[str]:
-    """Every literature prior must carry a verified DOI — an unopenable citation is not a citation."""
+    """Every citation the model makes must be openable and verified — priors AND the sources behind
+    a lever's intervention advice. An unopenable citation is not a citation.
+
+    (This checked only `prior` when it was written, and the name said so. It now covers anything the
+    model cites, because a reader cannot tell from the screen which internal field a claim came from.)
+    """
     problems = []
     for key, spec in (ont or ONT).items():
         for field in ("prior", "prior_secondary"):
@@ -104,7 +109,16 @@ def citation_problems(ont: dict | None = None) -> list[str]:
         # behind "cutting down is not quitting", say. It is held to the same bar: this is the
         # evidence a user reads on screen, and it lived in the service's source code until the
         # model claimed it. Something the model does not declare cannot be cited as the model's.
-        for i, src in enumerate(spec.get("intervention_evidence", {}).get("sources", [])):
+        # An `intervention_evidence` block that declares nothing is worse than none at all: it
+        # reads as "the model has sources for this" while shipping a clean bundle with zero. The
+        # whole point is that something the model does not declare cannot be cited as the model's.
+        ie = spec.get("intervention_evidence")
+        if ie is not None:
+            if not ie.get("sources"):
+                problems.append(f"{key}.intervention_evidence: declared with no sources")
+            if not ie.get("claim"):
+                problems.append(f"{key}.intervention_evidence: does not say what it is qualifying")
+        for i, src in enumerate((ie or {}).get("sources", [])):
             where = f"{key}.intervention_evidence.sources[{i}]"
             if not src.get("doi") and not src.get("url"):
                 problems.append(f"{where}: no doi/url")
