@@ -35,9 +35,10 @@ import os
 import re
 import unicodedata
 import urllib.request
-import xml.etree.ElementTree as ET
 import zipfile
 from collections import Counter, defaultdict
+
+from clock_model.fetch.air_quality import read_xlsx_rows
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
@@ -98,39 +99,10 @@ def _fetch(key: str) -> str:
 
 # ── WHO's workbook ────────────────────────────────────────────────────────────
 
-_NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
-
-
-def _read_xlsx_rows(path: str) -> list[list[str]]:
-    """Parse the single sheet with the standard library.
-
-    Deliberately no openpyxl: this repo should not grow a dependency to read one file, and the sheet
-    is a CSV in disguise — one cell per line, except that `type_of_stations` contains newlines inside
-    its quoted field, which Excel splits across cells. Rejoining a row's cells with newlines and then
-    parsing the whole document as CSV puts those fields back together.
-    """
-    z = zipfile.ZipFile(path)
-    shared = [
-        "".join(t.text or "" for t in si.iter(f"{_NS}t"))
-        for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall(f"{_NS}si")
-    ]
-
-    def col(ref: str) -> int:
-        n = 0
-        for ch in re.match(r"([A-Z]+)", ref).group(1):
-            n = n * 26 + ord(ch) - 64
-        return n - 1
-
-    lines = []
-    for row in ET.fromstring(z.read("xl/worksheets/sheet1.xml")).iter(f"{_NS}row"):
-        cells = {}
-        for c in row.findall(f"{_NS}c"):
-            v = c.find(f"{_NS}v")
-            cells[col(c.get("r"))] = (
-                None if v is None else (shared[int(v.text)] if c.get("t") == "s" else v.text)
-            )
-        lines.append("\n".join(cells.get(i) or "" for i in range(max(cells) + 1)) if cells else "")
-    return list(csv.reader(io.StringIO("\n".join(lines))))
+#: The parser moved into `clock_model.fetch.air_quality` when the production fetchers were written
+#: (W-B1a). It is imported rather than duplicated, and this experiment's committed output is the
+#: regression test for that move: re-running must reproduce `data/city_join.csv` byte for byte.
+_read_xlsx_rows = read_xlsx_rows
 
 
 def _num(x):
