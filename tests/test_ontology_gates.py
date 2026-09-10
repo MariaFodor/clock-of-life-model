@@ -105,6 +105,39 @@ def main():
         check(f"prior as {label} is reported, not raised", reports(problems, *frags),
               "; ".join(problems)[:70])
 
+    # The priors' verification branch was the ONLY enforcement of "verified" in the repo, covering
+    # 20 of 22 factors, and nothing pinned it: deleting it left this suite green, 50 gates passing
+    # and a bundle shipping. The sources' twin WAS pinned, so the suite tested one arm of a promise
+    # and not the other — the asymmetry two commits on this branch each set out to end.
+    for field in ("prior", "prior_secondary"):
+        donor = ONT[FACTOR]["prior"]
+        unverified = {k: v for k, v in donor.items() if k != "verified"}
+        problems = mutate(**{field: unverified})
+        check(f"an unverified {field} is reported, naming the field",
+              reports(problems, f"{FACTOR}.{field}", "never verified"), "; ".join(problems)[:70])
+
+    # `reports()` is only as strong as "one problem per defect". Join the list into a single string
+    # — a plausible tidy-up, since ontology_gates already does exactly that for display — and every
+    # fragment check goes on matching while the messages degrade freely. So: one defect, one
+    # problem; and separate defects stay separate rather than arriving as one blob.
+    one_defect = mutate(prior={k: v for k, v in ONT[FACTOR]["prior"].items() if k != "verified"})
+    check("one defect produces one problem", len(one_defect) == 1, f"{len(one_defect)}: {one_defect}")
+
+    srcs = copy.deepcopy(good["sources"])
+    srcs[0].pop("verified")
+    srcs[1].pop("doi")
+    two = mutate(intervention_evidence={**good, "sources": srcs})
+    check("two defects arrive as two problems, not one merged blob", len(two) == 2,
+          f"{len(two)}: {'; '.join(two)[:60]}")
+
+    # The index must name WHICH source is wrong. `sources[{i}]` -> `sources[0]` is one token, and no
+    # case reached the second source before this one.
+    srcs = copy.deepcopy(good["sources"])
+    srcs[1].pop("verified")
+    check("the second source is named as the second",
+          reports(mutate(intervention_evidence={**good, "sources": srcs}),
+                  f"{FACTOR}.intervention_evidence.sources[1]", "never verified"))
+
     failed = [n for n, ok, _ in checks if not ok]
     print(f"\nONTOLOGY GATES: {'PASS' if not failed else 'FAIL'}  ({len(checks) - len(failed)}/{len(checks)})")
     sys.exit(1 if failed else 0)
