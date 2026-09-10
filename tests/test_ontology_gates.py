@@ -127,16 +127,60 @@ def main():
     srcs[0].pop("verified")
     srcs[1].pop("doi")
     two = mutate(intervention_evidence={**good, "sources": srcs})
-    check("two defects arrive as two problems, not one merged blob", len(two) == 2,
+    # `> 1` and not `== 2`: an exact count fails when the gate gets STRONGER — adding a block-level
+    # summary problem, or a second message explaining a doi-less source, both break `== 2` while
+    # announcing "not one merged blob". What this needs to pin is that separate defects stay
+    # separate AND are attributed to the right source; the anti-duplication half is already pinned
+    # by the one-defect case above, on a cleaner fixture.
+    check("two defects arrive as two problems, not one merged blob",
+          len(two) > 1
+          and reports(two, f"{FACTOR}.intervention_evidence.sources[0]", "never verified")
+          and reports(two, f"{FACTOR}.intervention_evidence.sources[1]", "no doi/url"),
           f"{len(two)}: {'; '.join(two)[:60]}")
 
     # The index must name WHICH source is wrong. `sources[{i}]` -> `sources[0]` is one token, and no
-    # case reached the second source before this one.
+    # case reached the second source before this one. BOTH sites that format an index are covered:
+    # pinning one left the other free to hardcode 0.
     srcs = copy.deepcopy(good["sources"])
     srcs[1].pop("verified")
     check("the second source is named as the second",
           reports(mutate(intervention_evidence={**good, "sources": srcs}),
                   f"{FACTOR}.intervention_evidence.sources[1]", "never verified"))
+    srcs = copy.deepcopy(good["sources"])
+    srcs[1] = "10.1136/tc.2005.011932"
+    check("a non-object SECOND source is named as the second",
+          reports(mutate(intervention_evidence={**good, "sources": srcs}),
+                  f"{FACTOR}.intervention_evidence.sources[1]", "not an object"))
+
+    # All three sites that format `{field}` must say WHICH of prior/prior_secondary is wrong. One
+    # was pinned; the other two could collapse to the literal `prior` and report an env.prior_secondary
+    # defect as env.prior — the mislabelling this branch already claimed to have ended once.
+    check("a prior_secondary of the wrong shape is named as prior_secondary",
+          reports(mutate(prior_secondary="10.1136/bmj.m3324"),
+                  f"{FACTOR}.prior_secondary", "must be an object"))
+    check("a prior_secondary with no doi/url is named as prior_secondary",
+          reports(mutate(prior_secondary={"title": "x"}),
+                  f"{FACTOR}.prior_secondary", "no doi/url"))
+
+    # `elif` -> `if` is one token, and it makes a citation with NEITHER doi nor verified report
+    # "doi present but never verified" about a doi that is not present — a message that sends the
+    # author looking for the wrong thing, and a second problem for a single defect.
+    no_doi_no_verified = mutate(prior={"title": "x"})
+    check("a citation missing both doi and verification says so once, correctly",
+          len(no_doi_no_verified) == 1
+          and reports(no_doi_no_verified, f"{FACTOR}.prior", "no doi/url"),
+          "; ".join(no_doi_no_verified)[:70])
+
+    # `continue` -> `break` is one token, and it stops the scan at the first malformed source, so
+    # everything after it goes unreported and the author fixes one thing at a time.
+    srcs = copy.deepcopy(good["sources"])
+    srcs[0] = "10.1093/aje/kwf150"
+    srcs[1].pop("verified")
+    both = mutate(intervention_evidence={**good, "sources": srcs})
+    check("a malformed source does not hide the ones after it",
+          reports(both, f"{FACTOR}.intervention_evidence.sources[0]", "not an object")
+          and reports(both, f"{FACTOR}.intervention_evidence.sources[1]", "never verified"),
+          "; ".join(both)[:70])
 
     failed = [n for n, ok, _ in checks if not ok]
     print(f"\nONTOLOGY GATES: {'PASS' if not failed else 'FAIL'}  ({len(checks) - len(failed)}/{len(checks)})")
