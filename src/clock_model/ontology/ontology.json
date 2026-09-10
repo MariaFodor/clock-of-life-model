@@ -13,7 +13,25 @@
     "  causes        DOWNSTREAM nodes — mediators; NEVER adjusted for in a total-effect estimand",
     "  confounded_by UPSTREAM common causes — always adjusted for",
     "  prior         literature effect size with a VERIFIED doi (Crossref-checked at the stated date)",
-    "  study         slug into the service's study table"
+    "  study         slug into the service's study table",
+    "  companions    other indicators of the SAME categorical exposure — kept together so the",
+    "                reference group stays what the prior measured",
+    "  grade         strong | strong_for_harm | moderate | weak | na — the evidence grade shown to the reader",
+    "  clip_expected a sign constraint we EXPECT to bind, with clip_reason; an unexpected clip refuses",
+    "  waived_confounders  declared confounders we cannot adjust for, with waiver_reason",
+    "  intervention_evidence  sources qualifying how a factor may be ACTED ON, not the coefficient's",
+    "                value — e.g. that cutting down is worth less than the per-cigarette slope",
+    "                implies. Requires a `claim`, and each source an openable doi-or-url, a",
+    "                verification date, and which claim it supports.",
+    "  questions     interview question codes that feed this factor",
+    "  standardizer  mean/sd/source for a z-scored factor",
+    "  levels / reference_level  a categorical factor's category -> log-HR map, and which",
+    "                category the AVERAGE person is assumed to be. These are two different anchors:",
+    "                the map is anchored at its own zero (alcohol: none), the reference is where",
+    "                centring subtracts from (alcohol: light, whose log-HR is 0.03, not 0).",
+    "  prior_secondary  a second literature prior, held to the same citation bar as the first",
+    "  note / decision / assumption / companion_reason / clip_reason / waiver_reason",
+    "                prose the gates read for presence — a declared exception must say why"
   ],
   "_meta": {
     "version": "1.0.0",
@@ -30,7 +48,7 @@
       "measured": "2026-09-09"
     },
     "citations_verified_against": "https://api.crossref.org/works/{doi}",
-    "citations_verified_on": "2026-09-09"
+    "citations_verified_on": "2026-09-10"
   },
   "age": {
     "role": "baseline",
@@ -253,7 +271,32 @@
       "smk_current",
       "smk_former"
     ],
-    "companion_reason": "Smoking is one categorical exposure: never (reference) / former / current, plus a dose term for current smokers. Former-vs-never only means what Doll 2004 measured when the other indicators are in the model — otherwise the reference group silently becomes 'everyone else'."
+    "companion_reason": "Smoking is one categorical exposure: never (reference) / former / current, plus a dose term for current smokers. Former-vs-never only means what Doll 2004 measured when the other indicators are in the model — otherwise the reference group silently becomes 'everyone else'.",
+    "intervention_evidence": {
+      "claim": "Cutting down is worth much less than the per-cigarette gradient implies, so a What-If that prices a dose reduction must say so.",
+      "why_here": "The fitted cigs_day coefficient is a linear per-cigarette slope estimated ACROSS smokers. Applied to a reduction it assumes someone who cuts down ends up like someone who always smoked that little, which the cohort evidence does not support. The service returns a note saying this; the sources for that note belong with the coefficient they qualify, not in the service's source code.",
+      "sources": [
+        {
+          "doi": "10.1093/aje/kwf150",
+          "title": "Smoking Reduction, Smoking Cessation, and Mortality: A 16-year Follow-up of 19,732 Men and Women from the Copenhagen Centre for Prospective Population Studies",
+          "first_author": "Godtfredsen",
+          "year": 2002,
+          "verified": "2026-09-10",
+          "supports": "reduction_without_cessation_shows_little_to_no_all_cause_mortality_benefit",
+          "design": "prospective cohort, 19,732 people, 16-year follow-up"
+        },
+        {
+          "doi": "10.1136/tc.2005.011932",
+          "title": "Health consequences of smoking 1-4 cigarettes per day",
+          "first_author": "Bjartveit",
+          "year": 2005,
+          "verified": "2026-09-10",
+          "supports": "dose_response_is_concave_the_first_few_cigarettes_carry_more_than_their_share",
+          "design": "prospective cohort, 42,722 people, ~27-year follow-up"
+        }
+      ],
+      "why_cohort": "Cohort rather than trial, for two different reasons. Reduction trials are powered for cessation, not mortality, so they cannot settle what cutting down does to how long you live. And nobody can randomise people to smoke, which is why the low-dose evidence is observational too."
+    }
   },
   "activity": {
     "role": "lever",

@@ -16,9 +16,11 @@ def check(fit: dict) -> list[tuple[str, bool, str]]:
     ont = O.load()
     out: list[tuple[str, bool, str]] = []
 
-    # 1. Every literature prior must carry a verified, openable citation.
+    # 1. Every citation the model makes — priors, and the sources behind a lever's
+    #    intervention advice — must be openable and verified. A reader cannot tell from the
+    #    screen which internal field a claim came from, so neither should the gate.
     problems = O.citation_problems(ont)
-    out.append(("every literature prior carries a verified DOI/URL", not problems,
+    out.append(("every citation the model makes is openable and verified", not problems,
                 "; ".join(problems) if problems else "all verified"))
 
     # 2. Declared signs must hold in both estimands. This is the class of defect that shipped an

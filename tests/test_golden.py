@@ -59,14 +59,59 @@ def main():
     le_avg = baselines.remaining_le(qxM, 40, 1.0)     # RR=1 by construction for the average
     checks.append(("avg-RO male LE@40 ≈ national 34.5", abs(le_avg - lt["LIFEXP_M"]["Y40"]) < 0.6))
 
-    # Bundle-content checks (LEV-01): the exported v2.2.0 artifact must carry the literature
-    # standardizers, centring references, the corrected env role, and a data-vintage stamp.
-    broot = os.path.join(os.path.dirname(__file__), "..", "artifacts", "model-v3.0.1")
+    # Bundle-content checks (LEV-01): the shipped artifact must carry the literature standardizers,
+    # centring references, the corrected env role, and a data-vintage stamp.
+    # artifacts/ is gitignored IN ITS ENTIRETY, so a fresh checkout has no bundles at all — and
+    # reexport_offline reuses a prior bundle's country baselines, so it cannot bootstrap from
+    # nothing. Naming it unconditionally printed an instruction that dies with FileNotFoundError on
+    # exactly the checkout most likely to read it. Which command to print depends on what is on
+    # disk, so the message asks the disk instead of assuming.
+    BUNDLE = "model-v3.0.3"
+    VERSION = BUNDLE.split("model-v", 1)[1]
+    ARTIFACTS = os.path.join(os.path.dirname(__file__), "..", "artifacts")
+    broot = os.path.join(ARTIFACTS, BUNDLE)
     if not os.path.isdir(broot):
-        sys.exit("GOLDEN: PRECONDITION MISSING — artifacts/model-v3.0.1 not found. Generate it first:\n"
-                 "  PYTHONPATH=src .venv/bin/python reexport_offline.py --from-version 3.0.0 --version 3.0.1")
+        # Keyed on the version components, not the string: sorted() puts model-v3.0.9 after
+        # model-v3.0.10, and would hand you the older bundle while claiming the newest.
+        def _ver(d):
+            return tuple(int(p) if p.isdigit() else -1 for p in d.split("model-v", 1)[1].split("."))
+        prior = sorted((d for d in (os.listdir(ARTIFACTS) if os.path.isdir(ARTIFACTS) else [])
+                        if d.startswith("model-v")
+                        # a baselines/ directory with nothing in it produces a 0-country bundle that
+                        # still exits 0, so emptiness disqualifies it as a source to reuse
+                        and os.path.isdir(os.path.join(ARTIFACTS, d, "baselines"))
+                        and any(f.endswith(".json")
+                                for f in os.listdir(os.path.join(ARTIFACTS, d, "baselines")))),
+                       key=_ver)
+        how = (f"  PYTHONPATH=src python3 reexport_offline.py "
+               f"--from-version {prior[-1].split('model-v', 1)[1]} --version {VERSION}"
+               if prior else
+               f"  # no bundle on disk to reuse country baselines from, so this one needs the\n"
+               f"  # network (Eurostat life tables); reexport_offline.py cannot bootstrap from nothing:\n"
+               f"  PYTHONPATH=src python3 -m clock_model.train --countries all --version {VERSION}")
+        sys.exit(f"GOLDEN: PRECONDITION MISSING — artifacts/{BUNDLE} not found. Generate it first,\n"
+                 f"from the repository root:\n{how}")
     coefs = json.load(open(os.path.join(broot, "coefficients.json")))
-    checks.append(("bundle ships the ontology", os.path.exists(os.path.join(broot, "ontology.json"))))
+    ont_path = os.path.join(broot, "ontology.json")
+    checks.append(("bundle ships the ontology", os.path.exists(ont_path)))
+    bundle_ont = json.load(open(ont_path)) if os.path.exists(ont_path) else {}
+    # The ontology reaches the reader by travelling VERBATIM into the bundle, so that is what gets
+    # asserted — the whole file against its source, not a couple of fields.
+    #
+    # An earlier version of this check compared two DOI strings. It was green while the bundle was a
+    # revision behind the source in four other places, because those two strings had not changed:
+    # a stale verification date and the uncorrected `design` prose would both have shipped. A test
+    # for "copied verbatim" has to compare the copy with the original.
+    source_ont = json.load(open(os.path.join(os.path.dirname(__file__), "..", "src", "clock_model",
+                                             "ontology", "ontology.json")))
+    drift = sorted(k for k in set(source_ont) | set(bundle_ont)
+                   if source_ont.get(k) != bundle_ont.get(k))
+    checks.append(("bundle's ontology is the source ontology, verbatim"
+                   + (f" (drifted: {drift})" if drift else ""), not drift))
+    ie = (bundle_ont.get("cigs_day") or {}).get("intervention_evidence") or {}
+    checks.append(("bundle ships cigs_day's intervention evidence",
+                   {s.get("doi") for s in ie.get("sources", [])}
+                   == {"10.1093/aje/kwf150", "10.1136/tc.2005.011932"}))
     # A current smoker who skips the dose question must not be scored as smoking zero a day: since
     # the contrast fix, smk_current no longer absorbs dose, so the bundle has to supply the neutral
     # value rather than leaving the service to invent one.
@@ -74,9 +119,12 @@ def main():
     checks.append(("bundle ships a smoker-conditional dose default",
                    cd.get("cigs_day_when_current_smoker", 0) > 5))
     ev_any = json.load(open(os.path.join(broot, "evidence.json")))
+    # Anything but "na" is a grade shown to the reader, so anything but "na" needs a link. Listing
+    # the grades instead let `strong_for_harm` — alcohol's, and a documented value — slip the check
+    # silently. A closed list of what does NOT count is the safe direction: a new grade is covered
+    # the day it is invented rather than the day someone remembers to add it here.
     checks.append(("every graded factor carries an openable link",
-                   all(v.get("url") for v in ev_any.values()
-                       if v.get("grade") in ("strong", "moderate", "weak"))))
+                   all(v.get("url") for v in ev_any.values() if v.get("grade", "") != "na")))
     ev = json.load(open(os.path.join(broot, "evidence.json")))
     man = json.load(open(os.path.join(broot, "manifest.json")))
     for k in ("diet", "sedentary", "stress"):
