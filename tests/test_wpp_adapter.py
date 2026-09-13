@@ -106,21 +106,21 @@ def main():
     for iso, sexes in tables.items():
         e0 = {}
         for sex, qx in sexes.items():
-            e0[sex] = remaining_le(qx, 0, 1.0)
             pub = published.get(iso, {}).get(sex, {})
+            # THE integrator call, with the publisher's own open-interval expectation.
+            #
+            # This used to run without `ax_last` and then hand-correct the result here, which meant the
+            # suite passed a number the product never computed. The diagnosis in the old comment was
+            # right and is worth keeping: at age 100 qx is 1.0, so `remaining_le` priced the whole open
+            # interval at half a year while WPP prices it at its own ax, and that single constant
+            # explained 91% of the squared residual — not the infant-ax effect an earlier version
+            # blamed, which is two to three orders of magnitude too small. The signature gave it away:
+            # of the 20 worst tables, 15 were female and 0 male, and the worst six were the six highest
+            # survivorships to age 100. The fix belonged in the integrator, and is now there.
+            e0[sex] = remaining_le(qx, 0, 1.0, pub.get("ax_last"))
             if pub.get("ex0") is not None and pub.get("ax_last") is not None:
                 compared += 1
-                # Correcting the ONE thing that separates this integrator from the publisher's. At age
-                # 100 qx is 1.0, so `remaining_le` prices the whole open interval at half a year
-                # (`le += S * (1 - qa/2)`), while WPP prices it at its own ax ~ 2.8. That single
-                # constant explains 91% of the squared residual — NOT the infant-ax effect an earlier
-                # version of this comment blamed, which is worth 0.0002-0.002 yr, two to three orders
-                # of magnitude too small. The signature gave it away: of the 20 worst tables, 15 were
-                # female and 0 male, and the worst six are the six highest survivorships to age 100.
-                survivors = 1.0
-                for age in range(0, wpp.MAX_AGE):
-                    survivors *= 1.0 - qx[age]
-                corrected = e0[sex] + (pub["ax_last"] - 0.5) * survivors
+                corrected = e0[sex]
                 residuals.append(d := abs(corrected - pub["ex0"]))
                 raw_worst = max(raw_worst, abs(e0[sex] - pub["ex0"]))
                 if d > worst:
@@ -166,6 +166,29 @@ def main():
                    f"the closeout ({len(closed_early)} failures)", not closed_early))
     checks.append((f"remaining years at 95 exceeds 1.0 everywhere ({len(tail_fail)} failures)",
                    not tail_fail))
+
+    # ── the open terminal interval ─────────────────────────────────────────────
+    # The 95 closeout was fixed by moving to WPP; the defect MOVED to 100, because every WPP table ends
+    # at 100 with qx = 1.0. `remaining_le` charged the standard half-year and drove survivorship to
+    # zero, so ages 100 THROUGH 110 all returned exactly 0.5 — every country, both sexes, every risk
+    # profile — while the questionnaire accepts ages to 110. Checking age 95 could never catch it.
+    ro, ax = tables["RO"]["M"], published["RO"]["M"]["ax_last"]
+    checks.append(("without the publisher's ax, a 100-year-old is told exactly half a year",
+                   abs(remaining_le(ro, 100, 1.0) - 0.5) < 1e-9))
+    checks.append((f"with it they are told the publisher's own {ax:.2f} years",
+                   abs(remaining_le(ro, 100, 1.0, ax) - ax) < 1e-9))
+    # Still FLAT across 100-110, because 100+ is one open interval in the source and the table cannot
+    # resolve inside it — but flat at the right number. The product has to say which.
+    checks.append(("100 and 110 agree, because the source publishes one open interval for both",
+                   abs(remaining_le(ro, 110, 1.0, ax) - remaining_le(ro, 100, 1.0, ax)) < 1e-9))
+    # ax/rr is the exponential-tail scaling the interval's own ax assumes. Without the division a sick
+    # centenarian would be told the same as a healthy one.
+    checks.append(("a relative risk shortens the open interval too",
+                   remaining_le(ro, 100, 2.0, ax) < remaining_le(ro, 100, 1.0, ax) - 0.5))
+    axs = [v[x]["ax_last"] for v in published.values() for x in ("M", "F")
+           if v.get(x, {}).get("ax_last")]
+    checks.append((f"half a year was wrong everywhere, not only at the extremes "
+                   f"(smallest published ax anywhere is {min(axs):.2f})", min(axs) > 0.6))
 
     meta = wpp.source_metadata()
     checks.append(("provenance records a verified licence, its source page, and per-file fingerprints",

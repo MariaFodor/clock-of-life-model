@@ -18,7 +18,10 @@ from clock_model.model.baselines import remaining_le
 
 #: The adapter reproduces WPP's published `ex` to 0.018 yr once the open interval is priced the way WPP
 #: prices it (measured over all 711 tables; median 0.004). At 0.05 this catches a one-year time slip.
-MAX_PUBLISHED_GAP = 0.05
+#: Measured after the integrator learned about the open interval: worst 0.0181 across 474 country-sex
+#: tables, median 0.0040. Set at 0.03 — comfortably above the measurement, far below the 0.05 it had to
+#: be while the half-year default was throwing one country out by 0.43.
+MAX_PUBLISHED_GAP = 0.03
 #: Eurostat vs WPP across the 30 countries we already ship: median 0.27, max 1.73 (W-A1). The bands are
 #: set above the measurement, not at it — this gate is looking for a different SOURCE having been read,
 #: not for the two agencies to agree exactly.
@@ -50,8 +53,15 @@ EXPECTED_FALLBACKS = {"CH"}
 MIN_WITNESS_PAIRS = 48
 
 
-def _e(qx: dict, age: int) -> float:
-    return remaining_le({int(a): q for a, q in qx.items()}, age, 1.0)
+#: The open interval's own expectation must be a real number of years, not the half-year the integrator
+#: charges when it has none. Measured: `ax_last` runs 0.79 (Lesotho women) to 4.61 across the world, so
+#: anything at or below 0.6 means the closeout fell back to the default and every reader aged 100 to 110
+#: is being told the same wrong number.
+MIN_OPEN_INTERVAL_YEARS = 0.6
+
+
+def _e(qx: dict, age: int, ax_last: float | None = None) -> float:
+    return remaining_le({int(a): q for a, q in qx.items()}, age, 1.0, ax_last)
 
 
 def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bool, str]]:
@@ -79,11 +89,13 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
             if pub.get("ex0") is None or pub.get("ax_last") is None:
                 gaps.append((99.0, f"{iso}/{sex} has no published figure to check against"))
                 continue
-            survivors = 1.0
-            for age in range(0, wpp.MAX_AGE):
-                survivors *= 1.0 - qx[str(age)]
-            corrected = _e(qx, 0) + (pub["ax_last"] - 0.5) * survivors
-            gaps.append((abs(corrected - pub["ex0"]), f"{iso}/{sex}"))
+            # This used to read:
+            #     corrected = _e(qx, 0) + (pub["ax_last"] - 0.5) * survivors
+            # — the gate hand-correcting for an open interval the INTEGRATOR did not know about, and
+            # therefore passing a number the product never computed. `remaining_le` now takes `ax_last`
+            # itself, so the correction here would be counted twice. Removing it also tightened the
+            # gate: worst gap 0.4336 -> 0.0181, median 0.0112 -> 0.0040 across 474 tables.
+            gaps.append((abs(_e(qx, 0, pub["ax_last"]) - pub["ex0"]), f"{iso}/{sex}"))
     worst, worst_at = max(gaps) if gaps else (0.0, "-")
     out.append(("every life table reproduces its publisher's own life expectancy",
                 bool(gaps) and worst <= MAX_PUBLISHED_GAP,
@@ -93,9 +105,12 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
     # Not a swapped-sex detector — min/max are symmetric, so a swap leaves this unchanged (G1 catches
     # that, as the whole sex gap). What it buys is that B was not filled from somewhere else entirely.
     unbracketed = [iso for iso, b in baselines.items()
-                   if "B" in b["qx"] and not (min(_e(b["qx"]["M"], 0), _e(b["qx"]["F"], 0))
-                                              <= _e(b["qx"]["B"], 0)
-                                              <= max(_e(b["qx"]["M"], 0), _e(b["qx"]["F"], 0)))]
+                   if "B" in b["qx"] and not (
+                       min(_e(b["qx"]["M"], 0, (b.get("ax_last") or {}).get("M")),
+                           _e(b["qx"]["F"], 0, (b.get("ax_last") or {}).get("F")))
+                       <= _e(b["qx"]["B"], 0, (b.get("ax_last") or {}).get("B"))
+                       <= max(_e(b["qx"]["M"], 0, (b.get("ax_last") or {}).get("M")),
+                              _e(b["qx"]["F"], 0, (b.get("ax_last") or {}).get("F"))))]
     out.append(("both-sex life expectancy falls between the sexes", not unbracketed,
                 f"{len(unbracketed)} outside: {unbracketed[:5]}"))
 
@@ -108,7 +123,7 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
     out.append((f"no table closes before age {wpp.MAX_AGE}", not early,
                 f"{len(early)} close early: {early[:5]}"))
     thin = [f"{iso}/{sex}" for iso, b in baselines.items() for sex, qx in b["qx"].items()
-            if _e(qx, 95) <= 1.0]
+            if _e(qx, 95, (b.get("ax_last") or {}).get(sex)) <= 1.0]
     out.append(("a 95-year-old is given more than one year anywhere", not thin,
                 f"{len(thin)} under a year: {thin[:5]}"))
 
@@ -165,7 +180,8 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
             for sex in ("M", "F"):
                 if sex not in tables or sex not in b["qx"]:
                     continue
-                ours, theirs = _e(b["qx"][sex], 0), remaining_le(tables[sex], 0, 1.0)
+                ax = (b.get("ax_last") or {}).get(sex)
+                ours, theirs = _e(b["qx"][sex], 0, ax), remaining_le(tables[sex], 0, 1.0)
                 deltas.append((abs(ours - theirs), f"{iso}/{sex}"))
                 pairs.append((ours, theirs))
         if len(pairs) < MIN_WITNESS_PAIRS:
@@ -233,5 +249,31 @@ def check(baselines: dict, *, witness: dict | None = None) -> list[tuple[str, bo
            and not 1.0 <= b["env_reference"]["pm25"] <= 150.0]
     out.append(("every air reference is a plausible concentration", not bad,
                 "all inside [1, 150] ug/m3" if not bad else f"outside the band: {bad[:5]}"))
+
+    # ── The open terminal interval ────────────────────────────────────────────
+    # This gate exists because the 95 closeout was fixed and the defect simply MOVED to 100. Every WPP
+    # table ends at 100 with qx = 1.0, so `remaining_le` charged half a year and drove survivorship to
+    # zero: ages 100 to 110 all returned exactly 0.5, for every country and both sexes, while the
+    # questionnaire accepts ages to 110. Checking age 95 could never have caught it.
+    missing_ax = sorted(iso for iso, b in baselines.items() if not b.get("ax_last"))
+    out.append((
+        "every table carries the publisher's own expectation for its open final interval",
+        not missing_ax,
+        f"all {len(baselines)} carry ax_last" if not missing_ax
+        else f"{len(missing_ax)} do not ({missing_ax[:5]}) — their readers aged 100+ get a flat "
+             "half year"))
+
+    flat = []
+    for iso, b in baselines.items():
+        for sex, qx in b.get("qx", {}).items():
+            ax = (b.get("ax_last") or {}).get(sex)
+            e100 = _e(qx, 100, ax)
+            if e100 <= MIN_OPEN_INTERVAL_YEARS:
+                flat.append(f"{iso}/{sex}={e100:.2f}")
+    out.append((
+        "a centenarian is not told half a year",
+        not flat,
+        f"every table's e(100) exceeds {MIN_OPEN_INTERVAL_YEARS}" if not flat
+        else f"{len(flat)} tables close at a half year or less: {flat[:5]}"))
 
     return out
