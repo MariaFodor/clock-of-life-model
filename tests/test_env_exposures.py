@@ -3,7 +3,7 @@
 Two halves, following `test_wpp_adapter.py`. The first is pure and instant: the refusals, driven with
 synthetic rows, because those are the guards that decide whether a wrong number can enter looking right.
 The second runs against the real files and pins the measured coverage, because the PRODUCT'S COPY depends
-on those counts — a page that says "153 countries have no measurement since 2020" is making a factual
+on those counts — a page that says "152 countries have no measurement since 2020" is making a factual
 claim, and it has to break here when the claim stops being true rather than on a reader's screen.
 
 First run downloads ~5 MB and caches under data/cache/; later runs are instant.
@@ -83,12 +83,26 @@ def test_refusals() -> None:
     except ValueError:
         check("duplicate (iso3, city) pairs are refused", True)
 
+    for bad, label in (("", "empty"), ("Unknown", "'Unknown'"), ("N/A", "'N/A'")):
+        try:
+            A._validate_cities({f"X|c{i}": {"iso3": "XXX", "city": f"c{i}", "pm25": 12.0}
+                                for i in range(2500)}
+                               | {"X|b": {"iso3": "XXX", "city": bad, "pm25": 12.0}})
+            check(f"a city named {label} is refused", False, "accepted")
+        except ValueError:
+            check(f"a city named {label} is refused", True)
+
     try:
         A._validate_cities({f"X|c{i}": {"iso3": "XXX", "city": f"c{i}", "pm25": 12.0}
-                            for i in range(2500)} | {"X|": {"iso3": "XXX", "city": "", "pm25": 12.0}})
-        check("a name that is empty after stripping WHO's suffix is refused", False)
+                            for i in range(2500)}
+                           | {"X|s": {"iso3": "XXX", "city": "Helsinki/246", "pm25": 12.0}})
+        check("a name still carrying a NUMERIC country suffix is refused", False, "accepted")
     except ValueError:
-        check("a name that is empty after stripping WHO's suffix is refused", True)
+        check("a name still carrying a NUMERIC country suffix is refused", True)
+
+    check("the suffix stripper handles both shapes WHO actually uses",
+          A._SUFFIX.sub("", "Kabul/AFG") == "Kabul" and A._SUFFIX.sub("", "Unknown/246") == "Unknown"
+          and A._SUFFIX.sub("", "Baie-Saint-Paul") == "Baie-Saint-Paul")
 
     check("city band admits the measured extremes (0.92 Birkeland, 278.72 Mamak)",
           A.PM25_CITY_MIN <= 0.92 and A.PM25_CITY_MAX >= 278.72)
@@ -161,8 +175,8 @@ def test_city_layer() -> dict:
     print("\ncity layer (WHO AAQ v8.0)")
     cities = A.fetch_city_pm25()
     source = cities.pop("_source")
-    check("3,521 settlements in 85 countries inside 2020-2025",
-          len(cities) == 3521 and source["countries"] == 85,
+    check("3,515 settlements in 85 countries inside 2020-2025",
+          len(cities) == 3515 and source["countries"] == 85,
           f"{len(cities)} in {source['countries']}")
     check("no reading predates the window",
           all(A.MIN_YEAR <= v["year"] <= A.MAX_YEAR for v in cities.values()))
@@ -172,6 +186,14 @@ def test_city_layer() -> dict:
           not any(v["city"].endswith(f"/{v['iso3']}") for v in cities.values()))
     ro = [v for v in cities.values() if v["iso3"] == "ROU"]
     check("Romania has 60 measured settlements, not the 7 invented ones", len(ro) == 60, f"{len(ro)}")
+    # WHO uses "Unknown" for readings aggregated over stations with no single settlement behind them.
+    # Six shipped, and a downstream surface had to filter them out by name at render time.
+    check("no settlement is called 'Unknown'",
+          not [v for v in cities.values() if v["city"].casefold() in A.NOT_A_NAME],
+          str([v["city"] for v in cities.values() if v["city"].casefold() in A.NOT_A_NAME][:4]))
+    check("no stored name still carries WHO's country suffix, alpha-3 OR numeric",
+          not [v for v in cities.values() if "/" in v["city"]],
+          str([v["city"] for v in cities.values() if "/" in v["city"]][:4]))
     check("Bucharest is among them and is measured",
           any(v["city"].lower().startswith("bucure") for v in ro))
     check("provenance records the window it filtered on", source["window"] == [A.MIN_YEAR, A.MAX_YEAR])
