@@ -124,6 +124,10 @@ def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str], env: di
     tables = wpp.fetch_lifetables()
     places = wpp.fetch_locations()
     source = wpp.source_metadata()
+    # WPP's own `ax` for the final OPEN age interval — for a terminal open interval that IS remaining
+    # life expectancy there, because everyone in it dies in it. Without it every table closes at a flat
+    # half year and every reader aged 100 to 110 is told 0.5.
+    published = wpp.fetch_published()
     # Prevalence is fetched with the EUROSTAT code (EL), the baseline is keyed on the ISO one (GR).
     by_iso = {wpp.resolve(geo): geo for geo in scoreable_geos}
 
@@ -137,8 +141,14 @@ def build_baselines(coefs: dict, rates: dict, scoreable_geos: list[str], env: di
             "region": place.get("region"),
             "lifetable_year": wpp.LATEST_ESTIMATE_YEAR,
             "qx": {sex: {str(a): q for a, q in ages.items()} for sex, ages in qx.items()},
-            "national_le_40": {sex: round(baselines.remaining_le(ages, 40, 1.0), 2)
-                               for sex, ages in qx.items()},
+            # Per sex, because men and women do not live the same length of time in the open interval:
+            # Romania's are 1.90 and 1.49.
+            "ax_last": {sex: round(v["ax_last"], 6)
+                        for sex, v in (published.get(iso2) or {}).items() if v.get("ax_last")},
+            "national_le_40": {
+                sex: round(baselines.remaining_le(
+                    ages, 40, 1.0, (published.get(iso2, {}).get(sex) or {}).get("ax_last")), 2)
+                for sex, ages in qx.items()},
             "source": source,
         }
         # Keyed by ISO3 upstream, attached by ISO2 here. Absent for a country WHO has never measured —
