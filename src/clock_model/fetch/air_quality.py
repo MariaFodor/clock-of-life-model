@@ -41,7 +41,7 @@ TIMEOUT = 180
 #: Bumped whenever the filter, the column set or the cached payload's shape changes, so a stale extract
 #: built under different rules cannot be served as if it were this one. `fetch/wpp.py` documents the bug
 #: that earned this convention: adding a field without bumping produced a cache hit missing that field.
-CACHE_SCHEMA = 3
+CACHE_SCHEMA = 4
 
 CACHE = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "cache")
 
@@ -97,6 +97,23 @@ AAQ_SOURCE_URL = ("https://www.who.int/data/gho/data/themes/air-pollution/"
 #: WHO publishes PM10 and NO2 for settlements with no PM2.5. PM2.5 is the one the model prices, so it is
 #: the one that decides whether a settlement counts as measured.
 POLLUTANT = "pm25_concentration"
+
+#: WHO suffixes every settlement name with its country's code — 55,214 of 55,214 names carry one. Almost
+#: all are alpha-3 ("Kabul/AFG"); 25 are the NUMERIC ISO 3166 code instead ("Unknown/246" for Finland,
+#: "/752" for Sweden). The first version of this stripper handled only `[A-Z]{3}` and left `/246` sitting
+#: in a stored city name. Measured before widening: no name in the file contains a slash that is not a
+#: trailing code, so this cannot damage a real name like "Baie-Saint-Paul".
+_SUFFIX = re.compile(r"\s*/\s*(?:[A-Za-z]{3}|\d{1,4})\s*$")
+
+#: Names that are not names. WHO uses "Unknown" for readings it aggregates across stations with no single
+#: settlement behind them — Colombia's is 27 to 32 stations whose centroid MOVES from year to year
+#: (latitude 5.32 to 5.47), which is a national roll-up wearing a city's row.
+#:
+#: They are dropped rather than kept, because every consumer of this data treats a row as a PLACE: the
+#: interview offers it as somewhere you live, the relocate page as somewhere you could move to, and the
+#: map draws it as a dot with a 25 km ring around a point that is not stable between years. Six of them
+#: shipped, and the surface that found them had to filter them out by name at render time.
+NOT_A_NAME = {"unknown", "n/a", "na", "none", "-", "--", ""}
 
 #: Kosovo has four codes across the four files this product reads, and that is the whole of this table.
 #: WHO's air database says `KSV`; UN WPP and therefore the bundle say `XKX`; Natural Earth's geometry
@@ -347,7 +364,9 @@ def fetch_city_pm25(refresh: bool = False) -> dict:
         # without a space — both survive as separate settlements with the same stored name, which the
         # service's `UNIQUE (name, country)` then refused with "ON CONFLICT DO UPDATE command cannot
         # affect row a second time". One pair in 3,522, and it broke every integration test.
-        city = re.sub(r"\s*/\s*[A-Z]{3}\s*$", "", r[idx["city"]]).strip()
+        city = _SUFFIX.sub("", r[idx["city"]] or "").strip()
+        if city.casefold() in NOT_A_NAME:
+            continue
         key = f"{iso3}|{city}"
         if key in best and best[key]["year"] >= year:
             continue
@@ -391,8 +410,11 @@ def _validate_cities(best: dict) -> None:
                              f"[{PM25_CITY_MIN}, {PM25_CITY_MAX}]")
         if len(rec["iso3"]) != 3:
             raise ValueError(f"AAQ {key}: iso3 {rec['iso3']!r} is not a three-letter code")
-        if not rec["city"]:
-            raise ValueError(f"AAQ {key}: the city name is empty after stripping WHO's suffix")
+        if rec["city"].casefold() in NOT_A_NAME:
+            raise ValueError(f"AAQ {key}: {rec['city']!r} is not a place name — every row here is "
+                             "offered to a reader as somewhere they might live")
+        if _SUFFIX.search(rec["city"]):
+            raise ValueError(f"AAQ {key}: {rec['city']!r} still carries WHO's country suffix")
     # The invariant the service's UNIQUE (name, country) depends on, asserted where it is created
     # rather than discovered at seed time.
     pairs = [(r["iso3"], r["city"]) for r in best.values()]

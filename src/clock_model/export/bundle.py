@@ -75,6 +75,11 @@ def _validate_places(places: list, countries: dict) -> None:
                              f"{rec['ndvi_basis']!r}")
         if "illustrative" in str(rec.get("city", "")).lower():
             raise SystemExit(f"[bundle] place {where} is still labelled illustrative")
+        # Every row here is offered to a reader as somewhere they might live. "Unknown" is WHO's label
+        # for a reading aggregated over stations with no single settlement behind it — six shipped, and
+        # the surface that found them had to filter them out by name at render time.
+        if str(rec.get("city", "")).strip().casefold() in {"unknown", "n/a", "na", "none", "-", ""}:
+            raise SystemExit(f"[bundle] place {where} has no name — it cannot be offered as a place")
 
 
 def _merged_standardizer(fitted: dict) -> dict:
